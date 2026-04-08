@@ -10,7 +10,7 @@ namespace Surface_Structures
     [StarMapMod]
     public class SurfaceStructuresMod
     {
-        private static readonly Harmony MHarmony = new Harmony("Surface Thingy Majig");
+        private static readonly Harmony MHarmony = new Harmony("Surface Structures");
         private static bool _hasRan = false;
 
         [StarMapBeforeMain]

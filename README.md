@@ -1,6 +1,7 @@
 # Surface Structures
 
-This is a KSA mod that will place .glb meshes onto the surface of a Celestial at a specified Landmark. It currently only works with hardcoded values in `LandmarkMeshConfig.cs` but this will change.
+This is a KSA mod that will place .glb meshes onto the surface of a Celestial at a specified Landmark. It currently only works with hardcoded values in `LandmarkStructureConfig.cs
+` but this will change.
 
 ## Creating your own Surface Structures
 

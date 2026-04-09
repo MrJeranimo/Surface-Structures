@@ -10,14 +10,16 @@ namespace Surface_Structures
         private readonly StaticMeshRenderable _mesh;
         private readonly LandmarkReference _landmark;
         private readonly Celestial _celestial;
+        private LandmarkStructure _landmarkStructure;
         public static double HeightOffset { get; set; } = 0;
 
         public LandmarkMeshRenderer(
             LandmarkReference landmark,
             Celestial celestial,
-            string gltfId)
+            LandmarkStructure landmarkStructure)
         {
             _landmark = landmark;
+            _landmarkStructure = landmarkStructure;
             _celestial = celestial;
 
             var pbr = (IMeshRenderer<InstanceData>)
@@ -26,11 +28,11 @@ namespace Surface_Structures
                 Program.Instance.SuperMeshRenderSystem.MeshRendererStaticPrePass;
 
             // Load the glTF asset the same way CharacterAvatar does
-            var gltf = Program.Instance.SuperMeshRenderSystem.GltfSystem.GetOrLoad((AssetName)gltfId);
+            var gltf = Program.Instance.SuperMeshRenderSystem.GltfSystem.GetOrLoad((AssetName)landmarkStructure.MeshID);
 
             _mesh = new StaticMeshRenderable(pbr, gltf.Id, prepass);
 
-            DefaultCategory.Log.Info($"LandmarkMeshRenderer: Initialized mesh '{gltfId}' at " + $"Lat={landmark.Latitude.ToStringDegrees()} Lon={landmark.Longitude.ToStringDegrees()}",
+            DefaultCategory.Log.Info($"LandmarkMeshRenderer: Initialized mesh '{landmarkStructure.MeshID}' at " + $"Lat={landmark.Latitude.ToStringDegrees()} Lon={landmark.Longitude.ToStringDegrees()}",
             "LandmarkMeshRenderer", nameof(LandmarkMeshRenderer), 0);
         }
 

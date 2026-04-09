@@ -34,12 +34,12 @@ namespace Surface_Structures
                 foreach (var location in celestial.BodyTemplate.Locations)
                 {
                     if (location is LandmarkReference landmark &&
-                        LandmarkStructureConfig.MeshMap.TryGetValue(landmark.Id, out var gltfId))
+                        LandmarkRenderableRegistry.MeshMap.TryGetValue(landmark.Id, out var landmarkStructure))
                     {
-                        DefaultCategory.Log.Info($"LandmarkStructureConfig: Found mesh '{gltfId}' for landmark '{landmark.Id}'", "OnSystemLoaded");
+                        DefaultCategory.Log.Info($"LandmarkStructureConfig: Found mesh '{landmarkStructure.MeshID}' for landmark '{landmark.Id}'", "OnSystemLoaded");
 
                         LandmarkRenderableRegistry.Add(
-                            new LandmarkMeshRenderer(landmark, celestial, gltfId));
+                            new LandmarkMeshRenderer(landmark, celestial, landmarkStructure));
                     }
                 }
             }

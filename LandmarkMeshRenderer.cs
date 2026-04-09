@@ -11,7 +11,6 @@ namespace Surface_Structures
         private readonly LandmarkReference _landmark;
         private readonly Celestial _celestial;
         private LandmarkStructure _landmarkStructure;
-        public static double HeightOffset { get; set; } = 0;
 
         public LandmarkMeshRenderer(
             LandmarkReference landmark,
@@ -70,23 +69,46 @@ namespace Surface_Structures
         {
             // ForwardCcf is the surface normal at the landmark position
             double3 forwardCcf = _landmark.ForwardCcf;
-            float3 up = float3.Pack(in forwardCcf);
-
-            // Build orthonormal basis on the surface
-            float3 right = float3.Normalize(float3.Cross(up, new float3(0, 0, 1)));
-            float3 forward = float3.Cross(right, up);
+            // Points up from the surface
+            float3 surfaceUp = float3.Pack(in forwardCcf);
+            // Points east
+            float3 surfaceEast = float3.Normalize(float3.Cross(surfaceUp, new float3(0, 0, 1)));
+            // Points north
+            float3 surfaceNorth = float3.Normalize(float3.Cross(surfaceEast, surfaceUp));
 
             // Convert to EGO (camera-relative) space like PbrSpheres does
             Camera camera = viewport.GetCamera();
             double3 surfacePosEcl = _celestial.GetSurfacePositionEclFromCce(forwardCcf.Transform(_celestial.GetCcf2Cce()), false);
 
             double3 egoPos = camera.EclToEgo(surfacePosEcl);
+            // Position of the mesh
             float3 positionEgo = float3.Pack(in egoPos);
 
+            // Build and apply rotation
+            /*
+            floatQuat rotX = floatQuat.CreateFromAxisAngle(surfaceEast, _landmarkStructure.Rotation.X);
+            floatQuat rotY = floatQuat.CreateFromAxisAngle(surfaceNorth, _landmarkStructure.Rotation.Y);
+            floatQuat rotZ = floatQuat.CreateFromAxisAngle(surfaceUp, _landmarkStructure.Rotation.Z);
+            floatQuat combined = rotZ * rotY * rotX;
+            float4x4 rotation = float4x4.CreateFromQuaternion(combined);
+
+            surfaceEast = float3.Transform(surfaceEast, rotation);
+            surfaceNorth = float3.Transform(surfaceNorth, rotation);
+            surfaceUp = float3.Transform(surfaceUp, rotation);
+            */
+
+            // Apply scale
+            surfaceNorth = surfaceNorth * _landmarkStructure.Scale.X;
+            surfaceUp = surfaceUp * _landmarkStructure.Scale.Y;
+            surfaceEast = surfaceEast * _landmarkStructure.Scale.Z;
+
+            // Apply position offset
+            positionEgo = positionEgo + _landmarkStructure.Position;
+
             return new float4x4(
-                right.X, right.Y, right.Z, 0,
-                up.X, up.Y, up.Z, 0,
-                forward.X, forward.Y, forward.Z, 0,
+                surfaceEast.X, surfaceEast.Y, surfaceEast.Z, 0,
+                surfaceUp.X, surfaceUp.Y, surfaceUp.Z, 0,
+                surfaceNorth.X, surfaceNorth.Y, surfaceNorth.Z, 0,
                 positionEgo.X, positionEgo.Y, positionEgo.Z, 1
             );
         }

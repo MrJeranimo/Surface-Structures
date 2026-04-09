@@ -33,13 +33,13 @@ namespace Surface_Structures
             {
                 foreach (var location in celestial.BodyTemplate.Locations)
                 {
-                    if (location is LandmarkReference landmark &&
-                        LandmarkRenderableRegistry.MeshMap.TryGetValue(landmark.Id, out var landmarkStructure))
+                    if (location is LandmarkReference landmark && LandmarkRenderableRegistry.MeshMap.TryGetValue(landmark.Id, out var landmarkStructures))
                     {
-                        DefaultCategory.Log.Info($"LandmarkStructureConfig: Found mesh '{landmarkStructure.MeshID}' for landmark '{landmark.Id}'", "OnSystemLoaded");
-
-                        LandmarkRenderableRegistry.Add(
-                            new LandmarkMeshRenderer(landmark, celestial, landmarkStructure));
+                        foreach (var structure in landmarkStructures)
+                        {
+                            DefaultCategory.Log.Info($"LandmarkStructureConfig: Found mesh '{structure.MeshID}' for landmark '{landmark.Id}'");
+                            LandmarkRenderableRegistry.Add(new LandmarkMeshRenderer(landmark, celestial, structure));
+                        }
                     }
                 }
             }
@@ -54,12 +54,6 @@ namespace Surface_Structures
         [ModMenuEntry("Surface Structures")]
         public static void ModMenuEntry()
         {
-            double temp = LandmarkMeshRenderer.HeightOffset;
-            ImGui.InputDouble($"Surface offset", ref temp);
-            if(ImGui.Button("Change Offset"))
-            {
-                LandmarkMeshRenderer.HeightOffset = temp;
-            }
         }
     }
 }

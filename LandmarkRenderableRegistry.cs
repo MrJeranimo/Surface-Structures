@@ -6,7 +6,7 @@ namespace Surface_Structures {
         private static readonly List<LandmarkMeshRenderer> _renderers = new();
         public static Dictionary<string, LandmarkStructure[]> MeshMap = new()
         {
-            { "CCSFS LC-39A", [new LandmarkStructure("MetalRoughSpheres", new float3(100, 0, 100)), new LandmarkStructure("KittenHelmetGlb", new float3(-100, -100, -100), new float3(0, 0, 0), new float3(1, 1, 1))] },
+            { "CCSFS LC-39A", [new LandmarkStructure("DirectionCube", new float3(10, 0, 0))] },
         };
 
         public static IReadOnlyList<LandmarkMeshRenderer> All => _renderers;

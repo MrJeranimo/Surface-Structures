@@ -67,48 +67,54 @@ namespace Surface_Structures
 
         private float4x4 BuildSurfaceTransform(Viewport viewport)
         {
-            // ForwardCcf is the surface normal at the landmark position
             double3 forwardCcf = _landmark.ForwardCcf;
-            // Points up from the surface
-            float3 surfaceUp = float3.Pack(in forwardCcf);
-            // Points east
-            float3 surfaceEast = float3.Normalize(float3.Cross(surfaceUp, new float3(0, 0, 1)));
-            // Points north
-            float3 surfaceNorth = float3.Normalize(float3.Cross(surfaceEast, surfaceUp));
 
-            // Convert to EGO (camera-relative) space like PbrSpheres does
+            // Build basis in CCF (Z = north pole in CCF, which is correct per the docs)
+            double3 surfaceUpCcf = double3.Normalize(forwardCcf);
+            double3 surfaceEastCcf = double3.Normalize(double3.Cross(surfaceUpCcf, new double3(0, 0, 1)));
+            double3 surfaceNorthCcf = double3.Normalize(double3.Cross(surfaceUpCcf, surfaceEastCcf));
+
+            // Rotate basis from CCF into ECL-aligned space so offsets/rotations work correctly
+            // ccf2Cce rotation brings CCF axes into ECL-axis alignment (same axes as ECL, just origin on celestial)
+            floatQuat ccf2CceQuat = floatQuat.Pack(_celestial.GetCcf2Cce());
+            float3 surfaceUp = float3.Normalize(float3.TransformNormal(float3.Pack(surfaceUpCcf), float4x4.CreateFromQuaternion(ccf2CceQuat)));
+            float3 surfaceEast = float3.Normalize(float3.TransformNormal(float3.Pack(surfaceEastCcf), float4x4.CreateFromQuaternion(ccf2CceQuat)));
+            float3 surfaceNorth = float3.Normalize(float3.TransformNormal(float3.Pack(surfaceNorthCcf), float4x4.CreateFromQuaternion(ccf2CceQuat)));
+
+            // Get surface position in EGO space (this part was fine)
             Camera camera = viewport.GetCamera();
             double3 surfacePosEcl = _celestial.GetSurfacePositionEclFromCce(forwardCcf.Transform(_celestial.GetCcf2Cce()), false);
 
+            //surfacePosEcl += new double3(surfaceNorth.X, surfaceNorth.Y, surfaceNorth.Z) * _landmarkStructure.Position.Y;
+            //surfacePosEcl += new double3(surfaceUp.X, surfaceUp.Y, surfaceUp.Z) * _landmarkStructure.Position.Z;
+            surfacePosEcl += new double3(surfaceEast.X, surfaceEast.Y, surfaceEast.Z) * _landmarkStructure.Position.X;
+
             double3 egoPos = camera.EclToEgo(surfacePosEcl);
-            // Position of the mesh
             float3 positionEgo = float3.Pack(in egoPos);
 
-            // Build and apply rotation
-            /*
+            // Apply rotation to unit basis vectors FIRST, then scale
             floatQuat rotX = floatQuat.CreateFromAxisAngle(surfaceEast, _landmarkStructure.Rotation.X);
             floatQuat rotY = floatQuat.CreateFromAxisAngle(surfaceNorth, _landmarkStructure.Rotation.Y);
             floatQuat rotZ = floatQuat.CreateFromAxisAngle(surfaceUp, _landmarkStructure.Rotation.Z);
             floatQuat combined = rotZ * rotY * rotX;
-            float4x4 rotation = float4x4.CreateFromQuaternion(combined);
+            float4x4 rotMat = float4x4.CreateFromQuaternion(combined);
 
-            surfaceEast = float3.Transform(surfaceEast, rotation);
-            surfaceNorth = float3.Transform(surfaceNorth, rotation);
-            surfaceUp = float3.Transform(surfaceUp, rotation);
-            */
+            surfaceEast = float3.Normalize(float3.TransformNormal(surfaceEast, rotMat));
+            surfaceNorth = float3.Normalize(float3.TransformNormal(surfaceNorth, rotMat));
+            surfaceUp = float3.Normalize(float3.TransformNormal(surfaceUp, rotMat));
 
-            // Apply scale
-            surfaceNorth = surfaceNorth * _landmarkStructure.Scale.X;
-            surfaceUp = surfaceUp * _landmarkStructure.Scale.Y;
-            surfaceEast = surfaceEast * _landmarkStructure.Scale.Z;
+            // Scale AFTER rotation
+            float3 col0 = -surfaceEast * _landmarkStructure.Scale.X;
+            float3 col1 = surfaceUp * _landmarkStructure.Scale.Y;
+            float3 col2 = surfaceNorth * _landmarkStructure.Scale.Z;
 
-            // Apply position offset
+            // Position offset applied in EGO space (offset directions now correct since basis is ECL-aligned)
             positionEgo = positionEgo + _landmarkStructure.Position;
 
             return new float4x4(
-                surfaceEast.X, surfaceEast.Y, surfaceEast.Z, 0,
-                surfaceUp.X, surfaceUp.Y, surfaceUp.Z, 0,
-                surfaceNorth.X, surfaceNorth.Y, surfaceNorth.Z, 0,
+                col0.X, col0.Y, col0.Z, 0,
+                col1.X, col1.Y, col1.Z, 0,
+                col2.X, col2.Y, col2.Z, 0,
                 positionEgo.X, positionEgo.Y, positionEgo.Z, 1
             );
         }

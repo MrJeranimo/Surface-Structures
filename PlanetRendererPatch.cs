@@ -1,7 +1,8 @@
 ﻿using Brutal.Logging;
+using Brutal.Numerics;
+using Brutal.VulkanApi;
 using HarmonyLib;
 using KSA;
-using Brutal.VulkanApi;
 
 namespace Surface_Structures
 {

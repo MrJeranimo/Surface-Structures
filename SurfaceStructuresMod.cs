@@ -1,5 +1,6 @@
 ﻿using Brutal.ImGuiApi;
 using Brutal.Logging;
+using Brutal.Numerics;
 using HarmonyLib;
 using KSA;
 using ModMenu;
@@ -12,6 +13,7 @@ namespace Surface_Structures
     {
         private static readonly Harmony MHarmony = new Harmony("Surface Structures");
         private static bool _hasRan = false;
+        public static float3 Position = new float3(0, 0, 0);
 
         [StarMapBeforeMain]
         public void BeforeSystemSelect()
@@ -54,6 +56,7 @@ namespace Surface_Structures
         [ModMenuEntry("Surface Structures")]
         public static void ModMenuEntry()
         {
+            ImGui.DragFloat3("Position", ref Position);
         }
     }
 }

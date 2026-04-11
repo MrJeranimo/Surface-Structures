@@ -11,6 +11,8 @@ This mod does not include any Surface Structures on its own. You must either mak
 
 **License:** MIT
 
+**SpaceDock:** https://spacedock.info/mod/4202/Surface%20Structures
+
 ## Usage
 
 To use the mod, download the latest release and extract the folder into the `My Games/Kitten Space Agency/mods/` folder. 

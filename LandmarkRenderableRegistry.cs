@@ -4,10 +4,7 @@ namespace Surface_Structures {
     public static class LandmarkRenderableRegistry
     {
         private static readonly List<LandmarkMeshRenderer> _renderers = new();
-        public static Dictionary<string, LandmarkStructure[]> MeshMap = new()
-        {
-            { "CCSFS LC-39A", [new LandmarkStructure("DirectionCube", new float3(10, 0, 0))] },
-        };
+        public static Dictionary<string, LandmarkStructure[]> MeshMap = new();
 
         public static IReadOnlyList<LandmarkMeshRenderer> All => _renderers;
 

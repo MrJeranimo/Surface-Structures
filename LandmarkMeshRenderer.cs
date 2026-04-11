@@ -54,11 +54,6 @@ namespace Surface_Structures
                 DefaultCategory.Log.Info(
                     $"LandmarkMeshRenderer: ForwardCcf = {_landmark.ForwardCcf}",
                     "Draw", nameof(LandmarkMeshRenderer), 0);
-
-                DefaultCategory.Log.Info(
-                    $"MeshBucketHandles length: {_mesh.MeshBucketHandles.Length}, " +
-                    $"Handle[0] valid: {_mesh.MeshBucketHandles[0]}",
-                    "Draw", nameof(LandmarkMeshRenderer), 0);
                 _hasLoggedFirstDraw = true;
             }
 

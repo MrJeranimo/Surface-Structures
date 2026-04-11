@@ -19,6 +19,20 @@ namespace Surface_Structures
         public void BeforeSystemSelect()
         {
             MHarmony.PatchAll(typeof(SurfaceStructuresMod).Assembly);
+
+            XMLStructureFinder.FindModFolder();
+            Dictionary<string, string[]> found = XMLStructureFinder.FindSurfaceStructuresFiles();
+
+            foreach (var (modName, filePaths) in found)
+            {
+                foreach (var filePath in filePaths)
+                {
+                    Console.WriteLine($"Surface Structures - Found new XML file in, {modName}: {filePath}");
+                    SurfaceStructureParser.ParseFile(filePath);
+                }
+            }
+
+            SurfaceStructureParser.RegisterLandmarkStructures();
         }
 
         [StarMapBeforeGui]

@@ -2,12 +2,13 @@
 using Brutal.Numerics;
 using Core;
 using KSA;
+using System.Runtime.InteropServices.Swift;
 
 namespace Surface_Structures
 {
     public class LandmarkMeshRenderer : IDisposable
     {
-        private readonly StaticMeshRenderable _mesh;
+        private StaticMeshRenderable? _mesh;
         private readonly LandmarkReference _landmark;
         private readonly Celestial _celestial;
         private LandmarkStructure _landmarkStructure;
@@ -21,24 +22,28 @@ namespace Surface_Structures
             _landmarkStructure = landmarkStructure;
             _celestial = celestial;
 
-            var pbr = (IMeshRenderer<InstanceData>)
-                Program.Instance.SuperMeshRenderSystem.MeshRendererStaticPbr;
-            var prepass = (IMeshRenderer<InstanceData>)
-                Program.Instance.SuperMeshRenderSystem.MeshRendererStaticPrePass;
+            IMeshRenderer<InstanceData> pbr = Program.Instance.SuperMeshRenderSystem.MeshRendererStaticPbr;
+            IMeshRenderer<InstanceData> prepass = Program.Instance.SuperMeshRenderSystem.MeshRendererStaticPrePass;
 
             // Load the glTF asset the same way CharacterAvatar does
-            var gltf = Program.Instance.SuperMeshRenderSystem.GltfSystem.GetOrLoad((AssetName)landmarkStructure.MeshID);
+            try
+            {
+                GltfPbrAssetRef gltf = Program.Instance.SuperMeshRenderSystem.GltfSystem.GetOrLoad((AssetName)landmarkStructure.MeshID);
+                _mesh = new StaticMeshRenderable(pbr, gltf.Id, prepass);
 
-            _mesh = new StaticMeshRenderable(pbr, gltf.Id, prepass);
-
-            DefaultCategory.Log.Info($"LandmarkMeshRenderer: Initialized mesh '{landmarkStructure.MeshID}' at " + $"Lat={landmark.Latitude.ToStringDegrees()} Lon={landmark.Longitude.ToStringDegrees()}",
-            "LandmarkMeshRenderer", nameof(LandmarkMeshRenderer), 0);
+                DefaultCategory.Log.Info($"LandmarkMeshRenderer: Initialized mesh '{landmarkStructure.MeshID}' at " + $"Lat={landmark.Latitude.ToStringDegrees()} Lon={landmark.Longitude.ToStringDegrees()}");
+            }
+            catch (Exception ex)
+            {
+                DefaultCategory.Log.Error($"Surface Structures - Could not load mesh: {landmarkStructure.MeshID}. Exception\n{ex}");
+            }
         }
 
         private bool _hasLoggedFirstDraw = false;
 
         public void Draw(Viewport viewport)
         {
+            if (_mesh == null) return;
             _mesh.Transform = BuildSurfaceTransform(viewport);
 
             if (!_hasLoggedFirstDraw)
@@ -114,6 +119,6 @@ namespace Surface_Structures
             );
         }
 
-        public void Dispose() => _mesh.Dispose();
+        public void Dispose() => _mesh?.Dispose();
     }
 }

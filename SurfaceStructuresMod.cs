@@ -14,6 +14,8 @@ namespace Surface_Structures
         private static readonly Harmony MHarmony = new Harmony("Surface Structures");
         private static bool _hasRan = false;
         public static float3 Position = new float3(0, 0, 0);
+        public static bool Debug = false;
+        public static bool _showEditorWindow = false;
 
         [StarMapBeforeMain]
         public void BeforeSystemSelect()
@@ -33,6 +35,14 @@ namespace Surface_Structures
             }
 
             SurfaceStructureParser.RegisterLandmarkStructures();
+
+            ConfigReader config = new ConfigReader("config.json");
+
+            bool debug = config.GetOrDefault<bool>("debug", false);
+            Debug = debug;
+
+            if (Debug)
+                Console.WriteLine("Surface Structures - Running in debug mode");
         }
 
         [StarMapBeforeGui]
@@ -55,9 +65,24 @@ namespace Surface_Structures
                         {
                             DefaultCategory.Log.Info($"Surface Structures - Found mesh '{structure.MeshID}' for landmark '{landmark.Id}'");
                             LandmarkRenderableRegistry.Add(new LandmarkMeshRenderer(landmark, celestial, structure));
+                            structure.SetLoaded();
                         }
                     }
                 }
+            }
+
+            if (Debug)
+            {
+                StructureEditor.CreateStructureNames();
+            }
+        }
+
+        [StarMapAfterGui]
+        public void AfterGui(double dt)
+        {
+            if (StructureEditor.ShowEditorWindow)
+            {
+                StructureEditor.DrawWindow();
             }
         }
 
@@ -70,7 +95,14 @@ namespace Surface_Structures
         [ModMenuEntry("Surface Structures")]
         public static void ModMenuEntry()
         {
-            ImGui.DragFloat3("Position", ref Position);
+            if (!Debug)
+            {
+                ImGui.Text("Nothing to see here.");
+            }
+            else
+            {
+                ImGui.MenuItem("Structure Editor", "", ref StructureEditor.ShowEditorWindow);
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Surface_Structures
         private readonly LandmarkReference _landmark;
         private readonly Celestial _celestial;
         private LandmarkStructure _landmarkStructure;
+        private const float deg2rad = (MathF.PI / 180f);
 
         public LandmarkMeshRenderer(
             LandmarkReference landmark,
@@ -78,9 +79,9 @@ namespace Surface_Structures
             float3 positionEgo = float3.Pack(in egoPos);
 
             // Apply landmark rotation around each surface axis
-            floatQuat rotX = floatQuat.CreateFromAxisAngle(-surfaceNorth, _landmarkStructure.Rotation.X);
-            floatQuat rotY = floatQuat.CreateFromAxisAngle(surfaceEast, _landmarkStructure.Rotation.Y);
-            floatQuat rotZ = floatQuat.CreateFromAxisAngle(surfaceUp, _landmarkStructure.Rotation.Z);
+            floatQuat rotX = floatQuat.CreateFromAxisAngle(surfaceNorth, _landmarkStructure.Rotation.X * deg2rad);
+            floatQuat rotY = floatQuat.CreateFromAxisAngle(-surfaceEast, _landmarkStructure.Rotation.Y * deg2rad);
+            floatQuat rotZ = floatQuat.CreateFromAxisAngle(-surfaceUp, _landmarkStructure.Rotation.Z * deg2rad);
             floatQuat combined = rotZ * rotY * rotX;
             float4x4 rotMat = float4x4.CreateFromQuaternion(combined);
 

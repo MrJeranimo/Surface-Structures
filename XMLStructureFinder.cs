@@ -1,4 +1,5 @@
 ﻿using Brutal.Logging;
+using KSA;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,24 +8,14 @@ namespace Surface_Structures
 {
     public class XMLStructureFinder
     {
-        private static string _modsPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "My Games", "Kitten Space Agency", "mods"
-            );
+        private static string _modsPath = ModLibrary.LocalModsFolderPath;
 
         public static void FindModFolder()
         {
-            string modsPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "My Games", "Kitten Space Agency", "mods"
-            );
-
-            if (!Directory.Exists(modsPath))
+            if (!Directory.Exists(_modsPath))
             {
-                DefaultCategory.Log.Error("Surface Structures - Mods folder not found: " + modsPath);
+                DefaultCategory.Log.Error("Surface Structures - Mods folder not found: " + _modsPath);
             }
-
-            _modsPath = modsPath;
         }
 
         public static Dictionary<string, string[]> FindSurfaceStructuresFiles()

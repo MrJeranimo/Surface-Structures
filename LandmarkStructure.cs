@@ -2,7 +2,7 @@
 
 namespace Surface_Structures
 {
-    public struct LandmarkStructure
+    public class LandmarkStructure
     {
         public string ID;
         public string LandmarkName;
@@ -11,6 +11,7 @@ namespace Surface_Structures
         public float3 Rotation = new float3(0, 0, 0);
         public float3 Scale = new float3(1, 1, 1);
         public bool Visible = true;
+        public bool Loaded = false;
 
         public LandmarkStructure(string id, string landmarkName, string meshID)
         {
@@ -37,5 +38,7 @@ namespace Surface_Structures
             Scale = scale;
             Visible = visible;
         }
+
+        public void SetLoaded() { Loaded = true; }
     }
 }

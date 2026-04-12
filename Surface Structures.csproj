@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Brutal.Core.Common">
+      <HintPath>..\..\..\..\..\..\Program Files\Kitten Space Agency\Brutal.Core.Common.dll</HintPath>
+		<Private>false</Private>
+    </Reference>
     <Reference Include="Brutal.Core.Logging">
       <HintPath>..\..\..\..\..\..\Program Files\Kitten Space Agency\Brutal.Core.Logging.dll</HintPath>
 		<Private>false</Private>
@@ -37,6 +41,7 @@
     </Reference>
     <Reference Include="Brutal.Vulkan">
       <HintPath>..\..\..\..\..\..\Program Files\Kitten Space Agency\Brutal.Vulkan.dll</HintPath>
+		<Private>false</Private>
     </Reference>
     <Reference Include="KSA">
       <HintPath>..\..\..\..\..\..\Program Files\Kitten Space Agency\KSA.dll</HintPath>

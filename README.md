@@ -50,6 +50,8 @@ To create your own Surface Structure(s), you must create a `Surface Structures.x
 
 Each `<Surface Structure>` set of tags you create will correspond to one new Structure/Mesh drawn by this mod. Once you have your `Surface Structures.xml` filled out, the Meshes should be automatically drawn to those landmarks.
 
+To easily make complicated structures, there is a built-in Structure Editor ONLY when running in `debug` mode. To run the mod in `debug` mode, change the "debug" value to `true` in `config.json`.
+
 ### What each tag means
 
 The `id` in `<SurfaceStructure id="">` is the name of the structure.
@@ -71,7 +73,7 @@ The `id` in `<MeshID id="DirectionCube"/>` is the defined `id` in a `<GltfFile i
 
 The `<Visible>` tag just set the mesh to be visible or not. It is an optional tag as, by default, it is set to `true`.
 
-The `<Position>`, `<Rotation>`, and `<Scale>` tags let you apply transfom offsets to the mesh using the Landmark as (0, 0, 0). These tags are optional as, by default, they will be set to `(0, 0, 0)`, `(0, 0, 0)`, and `(1, 1, 1)` respectively.
+The `<Position>`, `<Rotation>`, and `<Scale>` tags let you apply transfom offsets to the mesh using the Landmark as (0, 0, 0). These tags are optional as, by default, they will be set to `(0, 0, 0)`, `(0, 0, 0)`, and `(1, 1, 1)` respectively. `<Rotation>` uses Degrees for its float values.
 
 > [!NOTE]
 > The convention follows the Right-Hand-Rule with,

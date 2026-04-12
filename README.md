@@ -43,6 +43,7 @@ To create your own Surface Structure(s), you must create a `Surface Structures.x
         <Position x="0" y="0" z="0"/>
         <Rotation x="0" y="0" z="0"/>
         <Scale x="1" y="1" z="1"/>
+        <Visible value="false"/>
     </SurfaceStructure>
 </Structures>
 ```
@@ -68,7 +69,9 @@ The `id` in `<MeshID id="DirectionCube"/>` is the defined `id` in a `<GltfFile i
 > [!IMPORTANT]
 > `<SurfaceStructure id="">`, `<Landmark name=""/>`, and `<MeshID id=""/>` must all exists and have valid values to register the Mesh to be drawn at the Landmark.
 
-The `<Position>`, `<Rotation>`, and `<Scale>` tags let you apply transfom offsets to the mesh using the Landmark as (0, 0, 0).
+The `<Visible>` tag just set the mesh to be visible or not. It is an optional tag as, by default, it is set to `true`.
+
+The `<Position>`, `<Rotation>`, and `<Scale>` tags let you apply transfom offsets to the mesh using the Landmark as (0, 0, 0). These tags are optional as, by default, they will be set to `(0, 0, 0)`, `(0, 0, 0)`, and `(1, 1, 1)` respectively.
 
 > [!NOTE]
 > The convention follows the Right-Hand-Rule with,

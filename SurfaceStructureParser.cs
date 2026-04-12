@@ -28,7 +28,13 @@ namespace Surface_Structures
                 if (scale == new float3(0, 0, 0))
                     scale = new float3(1, 1, 1);
 
-                _landmarkStructures.Add(new LandmarkStructure(id, landmarkName, meshID, position, rotation, scale));
+                string? visibleString = element.Element("Visible")?.Attribute("value")?.Value;
+                bool visible = true;
+
+                if (!string.IsNullOrEmpty(visibleString))
+                    visible = bool.TryParse(visibleString, out bool result) ? result : true;
+
+                _landmarkStructures.Add(new LandmarkStructure(id, landmarkName, meshID, position, rotation, scale, visible));
             }
         }
 

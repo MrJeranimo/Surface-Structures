@@ -10,6 +10,7 @@ namespace Surface_Structures
         public float3 Position = new float3(0, 0, 0);
         public float3 Rotation = new float3(0, 0, 0);
         public float3 Scale = new float3(1, 1, 1);
+        public bool Visible = true;
 
         public LandmarkStructure(string id, string landmarkName, string meshID)
         {
@@ -26,7 +27,7 @@ namespace Surface_Structures
             Position = position;
         }
 
-        public LandmarkStructure(string id, string landmarkName, string meshID, float3 position, float3 rotation, float3 scale)
+        public LandmarkStructure(string id, string landmarkName, string meshID, float3 position, float3 rotation, float3 scale, bool visible)
         {
             ID = id;
             LandmarkName = landmarkName;
@@ -34,6 +35,7 @@ namespace Surface_Structures
             Position = position;
             Rotation = rotation;
             Scale = scale;
+            Visible = visible;
         }
     }
 }

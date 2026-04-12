@@ -31,7 +31,7 @@ namespace Surface_Structures
                 GltfPbrAssetRef gltf = Program.Instance.SuperMeshRenderSystem.GltfSystem.GetOrLoad((AssetName)landmarkStructure.MeshID);
                 _mesh = new StaticMeshRenderable(pbr, gltf.Id, prepass);
 
-                DefaultCategory.Log.Info($"LandmarkMeshRenderer: Initialized mesh '{landmarkStructure.MeshID}' at " + $"Lat={landmark.Latitude.ToStringDegrees()} Lon={landmark.Longitude.ToStringDegrees()}");
+                DefaultCategory.Log.Info($"Surface Structures - Initialized mesh '{landmarkStructure.MeshID}' at Lat={landmark.Latitude.ToStringDegrees()} Lon={landmark.Longitude.ToStringDegrees()}");
             }
             catch (Exception ex)
             {
@@ -39,29 +39,10 @@ namespace Surface_Structures
             }
         }
 
-        private bool _hasLoggedFirstDraw = false;
-
         public void Draw(Viewport viewport)
         {
-            if (_mesh == null) return;
+            if (_mesh == null || !_landmarkStructure.Visible) return;
             _mesh.Transform = BuildSurfaceTransform(viewport);
-
-            if (!_hasLoggedFirstDraw)
-            {
-                float4x4 t = _mesh.Transform;
-                DefaultCategory.Log.Info(
-                    $"LandmarkMeshRenderer: Transform position = " +
-                    $"({t.M41}, {t.M42}, {t.M43})",
-                    "Draw", nameof(LandmarkMeshRenderer), 0);
-                DefaultCategory.Log.Info(
-                    $"LandmarkMeshRenderer: SurfaceRadius = {_celestial.RenderData.SurfaceRadius}",
-                    "Draw", nameof(LandmarkMeshRenderer), 0);
-                DefaultCategory.Log.Info(
-                    $"LandmarkMeshRenderer: ForwardCcf = {_landmark.ForwardCcf}",
-                    "Draw", nameof(LandmarkMeshRenderer), 0);
-                _hasLoggedFirstDraw = true;
-            }
-
             _mesh.Draw();
         }
 

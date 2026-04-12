@@ -53,7 +53,7 @@ namespace Surface_Structures
                     {
                         foreach (var structure in landmarkStructures)
                         {
-                            DefaultCategory.Log.Info($"LandmarkStructureConfig: Found mesh '{structure.MeshID}' for landmark '{landmark.Id}'");
+                            DefaultCategory.Log.Info($"Surface Structures - Found mesh '{structure.MeshID}' for landmark '{landmark.Id}'");
                             LandmarkRenderableRegistry.Add(new LandmarkMeshRenderer(landmark, celestial, structure));
                         }
                     }

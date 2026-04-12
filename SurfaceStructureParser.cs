@@ -34,7 +34,7 @@ namespace Surface_Structures
                 if (!string.IsNullOrEmpty(visibleString))
                     visible = bool.TryParse(visibleString, out bool result) ? result : true;
 
-                _landmarkStructures.Add(new LandmarkStructure(id, landmarkName, meshID, position, rotation, scale, visible));
+                _landmarkStructures.Add(new LandmarkStructure(id, landmarkName, meshID, filePath, position, rotation, scale, visible));
             }
         }
 
@@ -75,6 +75,41 @@ namespace Surface_Structures
                     LandmarkRenderableRegistry.MeshMap[structure.LandmarkName] = existing.ToArray();
                 }
             }
+        }
+
+        public static void SaveStructure(LandmarkStructure structure)
+        {
+            XDocument doc = XDocument.Load(structure.FilePath);
+
+            foreach (var element in doc.Descendants("SurfaceStructure"))
+            {
+                string? id = element.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(id))
+                    continue;
+
+                if (structure.ID != id)
+                    continue;
+
+                WriteFloat3(element.Element("Position"), structure.Position);
+                WriteFloat3(element.Element("Rotation"), structure.Rotation);
+                WriteFloat3(element.Element("Scale"), structure.Scale);
+
+                var visibleElement = element.Element("Visible");
+                if (visibleElement != null)
+                    visibleElement.SetAttributeValue("value", structure.Visible.ToString().ToLower());
+            }
+
+            doc.Save(structure.FilePath);
+        }
+
+        private static void WriteFloat3(XElement? element, float3 value)
+        {
+            if (element == null)
+                return;
+
+            element.SetAttributeValue("x", value.X.ToString(CultureInfo.InvariantCulture));
+            element.SetAttributeValue("y", value.Y.ToString(CultureInfo.InvariantCulture));
+            element.SetAttributeValue("z", value.Z.ToString(CultureInfo.InvariantCulture));
         }
     }
 }

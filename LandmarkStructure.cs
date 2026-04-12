@@ -4,35 +4,39 @@ namespace Surface_Structures
 {
     public class LandmarkStructure
     {
-        public string ID;
-        public string LandmarkName;
-        public string MeshID;
+        public readonly string ID;
+        public readonly string LandmarkName;
+        public readonly string MeshID;
+        public readonly string FilePath;
         public float3 Position = new float3(0, 0, 0);
         public float3 Rotation = new float3(0, 0, 0);
         public float3 Scale = new float3(1, 1, 1);
         public bool Visible = true;
         public bool Loaded = false;
 
-        public LandmarkStructure(string id, string landmarkName, string meshID)
+        public LandmarkStructure(string id, string landmarkName, string meshID, string filePath)
         {
             ID = id;
             LandmarkName = landmarkName;
             MeshID = meshID;
+            FilePath = filePath;
         }
 
-        public LandmarkStructure(string id, string landmarkName, string meshID, float3 position)
+        public LandmarkStructure(string id, string landmarkName, string meshID, string filePath, float3 position)
         {
             ID = id;
             LandmarkName = landmarkName;
             MeshID = meshID;
+            FilePath = filePath;
             Position = position;
         }
 
-        public LandmarkStructure(string id, string landmarkName, string meshID, float3 position, float3 rotation, float3 scale, bool visible)
+        public LandmarkStructure(string id, string landmarkName, string meshID, string filePath, float3 position, float3 rotation, float3 scale, bool visible)
         {
             ID = id;
             LandmarkName = landmarkName;
             MeshID = meshID;
+            FilePath = filePath;
             Position = position;
             Rotation = rotation;
             Scale = scale;

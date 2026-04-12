@@ -2,8 +2,6 @@
 
 This is a KSA mod that will place .glb meshes onto the surface of a Celestial at a specified Landmark. The mod will automatically find all Surface Structures defined in other mods in `Documents/My Games/Kitten Space Agency/mods` that have a file named `Surface Structures.xml`.
 
-This mod does not include any Surface Structures on its own. You must either make your own Structures or download a mod that has them.
-
 > [!Important]
 > Requirements:
 > - [StarMap mod loader](https://github.com/StarMapLoader/StarMap)
@@ -49,8 +47,9 @@ To create your own Surface Structure(s), you must create a `Surface Structures.x
 </Structures>
 ```
 
-> [!NOTE]
-> The `<Position>`, `<Rotation>`, and `<Scale>` tags currently do not work. They are only there for the future, when fixed.
+Each `<Surface Structure>` set of tags you create will correspond to one new Structure/Mesh drawn by this mod. Once you have your `Surface Structures.xml` filled out, the Meshes should be automatically drawn to those landmarks.
+
+### What each tag means
 
 The `id` in `<SurfaceStructure id="">` is the name of the structure.
 
@@ -69,4 +68,27 @@ The `id` in `<MeshID id="DirectionCube"/>` is the defined `id` in a `<GltfFile i
 > [!IMPORTANT]
 > `<SurfaceStructure id="">`, `<Landmark name=""/>`, and `<MeshID id=""/>` must all exists and have valid values to register the Mesh to be drawn at the Landmark.
 
-Each `<Surface Structure>` set of tags you create will correspond to one new Structure/Mesh drawn by this mod. Once you have your `Surface Structures.xml` filled out, the Meshes should be automatically drawn to those landmarks.
+The `<Position>`, `<Rotation>`, and `<Scale>` tags let you apply transfom offsets to the mesh using the Landmark as (0, 0, 0).
+
+> [!NOTE]
+> The convention follows the Right-Hand-Rule with,
+> 
+> +X = Forward [East]
+> 
+> +Y = Left [North]
+> 
+> +Z = Up [Up]
+
+This is self explanitory for Position and Scale. 
+
+> [!NOTE]
+>
+> For Rotation,
+>
+> +X will PITCH the Foward side UP
+>
+> +Y will ROLL the mesh to the LEFT
+>
+> +Z will YAW the mesh to the RIGHT.
+
+The Position, Rotation, and Scale are all independent of each other so you do not need to worry about order of application. The Rotations are done with a Quaternion so you do not need to worry about gimbal lock.

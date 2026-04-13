@@ -9,7 +9,7 @@ namespace Surface_Structures
     public class LandmarkMeshRenderer : IDisposable
     {
         private StaticMeshRenderable? _mesh;
-        private readonly LandmarkReference _landmark;
+        private LandmarkReference _landmark;
         private readonly Celestial _celestial;
         private LandmarkStructure _landmarkStructure;
         private const float deg2rad = (MathF.PI / 180f);
@@ -31,7 +31,7 @@ namespace Surface_Structures
             {
                 GltfPbrAssetRef gltf = Program.Instance.SuperMeshRenderSystem.GltfSystem.GetOrLoad((AssetName)landmarkStructure.MeshID);
                 _mesh = new StaticMeshRenderable(pbr, gltf.Id, prepass);
-
+                _landmarkStructure.SetLoaded();
                 DefaultCategory.Log.Info($"Surface Structures - Initialized mesh '{landmarkStructure.MeshID}' at Lat={landmark.Latitude.ToStringDegrees()} Lon={landmark.Longitude.ToStringDegrees()}");
             }
             catch (Exception ex)
@@ -100,6 +100,11 @@ namespace Surface_Structures
                 col2.X, col2.Y, col2.Z, 0,
                 positionEgo.X, positionEgo.Y, positionEgo.Z, 1
             );
+        }
+
+        public void UpdateLandmark(LandmarkReference landmark)
+        {
+            _landmark = landmark;
         }
 
         public void Dispose() => _mesh?.Dispose();

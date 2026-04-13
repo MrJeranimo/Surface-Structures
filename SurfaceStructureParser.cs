@@ -1,4 +1,5 @@
 ﻿using Brutal.Numerics;
+using KSA;
 using System.Globalization;
 using System.Xml.Linq;
 
@@ -6,17 +7,44 @@ namespace Surface_Structures
 {
     public class SurfaceStructureParser
     {
+        private static List<KeyValuePair<string, LandmarkReference>> _landmarks = new List<KeyValuePair<string, LandmarkReference>>();
         private static List<LandmarkStructure> _landmarkStructures = new List<LandmarkStructure>();
+
+        public static List<KeyValuePair<string, LandmarkReference>> Landmarks => _landmarks;
 
         public static void ParseFile(string filePath)
         {
             XDocument doc = XDocument.Load(filePath);
 
-            foreach (var element in doc.Descendants("SurfaceStructure"))
+            foreach (XElement element in doc.Descendants("Landmark"))
             {
-                string? id = element.Attribute("id")?.Value;
-                string? landmarkName = element.Element("Landmark")?.Attribute("name")?.Value;
-                string? meshID = element.Element("MeshID")?.Attribute("id")?.Value;
+                Console.WriteLine($"Parsing Landmarks in file: {filePath}");
+                string? name = element.Attribute("Name")?.Value;
+                string? celestial = element.Element("Celestial")?.Attribute("Id")?.Value;
+
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(celestial))
+                    continue;
+
+                double longitude = ParseDouble(element.Element("Longitude")?.Attribute("Degrees")?.Value);
+                double latitude = ParseDouble(element.Element("Latitude")?.Attribute("Degrees")?.Value);
+                bool visible = ParseBool(element.Element("Visible")?.Attribute("Value")?.Value);
+
+                Console.WriteLine($"Landmark: {name}, Celestial: {celestial}, Longitude: {longitude}, Latitude: {latitude}, Visible: {visible}");
+
+                LandmarkReference landmark = new LandmarkReference();
+                landmark.Latitude = RadianReference.FromDegrees(latitude);
+                landmark.Longitude = RadianReference.FromDegrees(longitude);
+                landmark.Id = name;
+                landmark.OnDataLoad(Mod.Empty);
+
+                _landmarks.Add(new KeyValuePair<string, LandmarkReference>(celestial, landmark));
+            }
+
+            foreach (XElement element in doc.Descendants("SurfaceStructure"))
+            {
+                string? id = element.Attribute("Id")?.Value;
+                string? landmarkName = element.Element("Landmark")?.Attribute("Name")?.Value;
+                string? meshID = element.Element("MeshID")?.Attribute("Id")?.Value;
 
                 if (string.IsNullOrEmpty(meshID) || string.IsNullOrEmpty(landmarkName) || string.IsNullOrEmpty(id))
                     continue;
@@ -28,11 +56,7 @@ namespace Surface_Structures
                 if (scale == new float3(0, 0, 0))
                     scale = new float3(1, 1, 1);
 
-                string? visibleString = element.Element("Visible")?.Attribute("value")?.Value;
-                bool visible = true;
-
-                if (!string.IsNullOrEmpty(visibleString))
-                    visible = bool.TryParse(visibleString, out bool result) ? result : true;
+                bool visible = ParseBool(element.Element("Visible")?.Attribute("value")?.Value);
 
                 _landmarkStructures.Add(new LandmarkStructure(id, landmarkName, meshID, filePath, position, rotation, scale, visible));
             }
@@ -43,9 +67,9 @@ namespace Surface_Structures
             if (element == null)
                 return new float3(0, 0, 0);
 
-            float x = ParseFloat(element.Attribute("x"));
-            float y = ParseFloat(element.Attribute("y"));
-            float z = ParseFloat(element.Attribute("z"));
+            float x = ParseFloat(element.Attribute("X"));
+            float y = ParseFloat(element.Attribute("Y"));
+            float z = ParseFloat(element.Attribute("Z"));
 
             return new float3(x, y, z);
         }
@@ -58,6 +82,22 @@ namespace Surface_Structures
             return float.TryParse(attribute.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float result)
                 ? result
                 : 0f;
+        }
+
+        private static double ParseDouble(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return 0.0;
+            return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double result)
+                ? result
+                : 0.0;
+        }
+
+        private static bool ParseBool(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return true;
+            return bool.TryParse(value, out bool result) ? result : true;
         }
 
         public static void RegisterLandmarkStructures()
@@ -83,20 +123,28 @@ namespace Surface_Structures
 
             foreach (var element in doc.Descendants("SurfaceStructure"))
             {
-                string? id = element.Attribute("id")?.Value;
+                string? id = element.Attribute("Id")?.Value;
                 if (string.IsNullOrEmpty(id))
                     continue;
 
                 if (structure.ID != id)
                     continue;
 
+                XElement? landmark = element.Element("Landmark");
+                string? landmarkName = landmark?.Attribute("Name")?.Value;
+                if(string.IsNullOrEmpty(landmarkName))
+                    continue;
+
+                if(landmark != null)
+                    landmark.SetAttributeValue("Name", structure.LandmarkName);
+
                 WriteFloat3(element.Element("Position"), structure.Position);
                 WriteFloat3(element.Element("Rotation"), structure.Rotation);
                 WriteFloat3(element.Element("Scale"), structure.Scale);
 
-                var visibleElement = element.Element("Visible");
+                XElement? visibleElement = element.Element("Visible");
                 if (visibleElement != null)
-                    visibleElement.SetAttributeValue("value", structure.Visible.ToString().ToLower());
+                    visibleElement.SetAttributeValue("Value", structure.Visible.ToString().ToLower());
             }
 
             doc.Save(structure.FilePath);
@@ -107,9 +155,9 @@ namespace Surface_Structures
             if (element == null)
                 return;
 
-            element.SetAttributeValue("x", value.X.ToString(CultureInfo.InvariantCulture));
-            element.SetAttributeValue("y", value.Y.ToString(CultureInfo.InvariantCulture));
-            element.SetAttributeValue("z", value.Z.ToString(CultureInfo.InvariantCulture));
+            element.SetAttributeValue("X", value.X.ToString(CultureInfo.InvariantCulture));
+            element.SetAttributeValue("Y", value.Y.ToString(CultureInfo.InvariantCulture));
+            element.SetAttributeValue("Z", value.Z.ToString(CultureInfo.InvariantCulture));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Brutal.ImGuiApi;
 using Brutal.Numerics;
+using KSA;
 using System.Text;
 
 namespace Surface_Structures
@@ -10,6 +11,9 @@ namespace Surface_Structures
         private static LandmarkStructure? _selectedStructure = null;
         private static int _selectedStructureIndex = 0;
         private static string _structureNames = string.Empty;
+        private static int _selectedLandmarkIndex = 0;
+        private static string _landmarkNames = string.Empty;
+        private static LandmarkReference? _selectedLandmark = null;
 
         public static void DrawWindow() 
         {
@@ -37,6 +41,16 @@ namespace Surface_Structures
                     ImGui.InputFloat3("Scale", ref _selectedStructure.Scale);
                     ImGui.Spacing();
                     ImGui.Checkbox("Visible", ref _selectedStructure.Visible);
+                    ImGui.Spacing();
+                    ImGui.Separator();
+                    ImGui.Spacing();
+                    ImGui.Combo("Landmark", ref _selectedLandmarkIndex, _landmarkNames, _landmarkNames.Length);
+                    ImGui.Spacing();
+                    if(ImGui.Button("Change Landmark"))
+                    {
+                        findLandmark();
+                        ChangeStructureLandmark();
+                    }
                     ImGui.Spacing();
                     ImGui.Separator();
                     ImGui.Spacing();
@@ -110,6 +124,43 @@ namespace Surface_Structures
                     index++;
                 }
             }
+        }
+
+        public static void CreateLandmarkNames()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (Celestial celestial in Universe.CurrentSystem!.All.OfType<Celestial>())
+            {
+                foreach (LandmarkReference landmark in celestial.BodyTemplate.Locations.OfType<LandmarkReference>())
+                {
+                    sb.Append(landmark.Id).Append('\0');
+                }
+            }
+            _landmarkNames = sb.ToString();
+        }
+
+        private static void findLandmark()
+        {
+            int index = 0;
+            foreach (Celestial celestial in Universe.CurrentSystem!.All.OfType<Celestial>())
+            {
+                foreach (LandmarkReference landmark in celestial.BodyTemplate.Locations.OfType<LandmarkReference>())
+                {
+                    if (index == _selectedLandmarkIndex)
+                    {
+                        _selectedLandmark = landmark;
+                        return;
+                    }
+                    index++;
+                }
+            }
+        }
+
+        private static void ChangeStructureLandmark()
+        {
+            LandmarkMeshRenderer renderer = LandmarkRenderableRegistry.All[_selectedStructure!.RendererIndex];
+            renderer.UpdateLandmark(_selectedLandmark!);
+            _selectedStructure!.LandmarkName = _selectedLandmark!.Id;
         }
     }
 }

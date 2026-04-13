@@ -5,7 +5,7 @@ namespace Surface_Structures
     public class LandmarkStructure
     {
         public readonly string ID;
-        public readonly string LandmarkName;
+        public string LandmarkName;
         public readonly string MeshID;
         public readonly string FilePath;
         public float3 Position = new float3(0, 0, 0);
@@ -13,6 +13,7 @@ namespace Surface_Structures
         public float3 Scale = new float3(1, 1, 1);
         public bool Visible = true;
         public bool Loaded = false;
+        public int RendererIndex = -1;
 
         public LandmarkStructure(string id, string landmarkName, string meshID, string filePath)
         {

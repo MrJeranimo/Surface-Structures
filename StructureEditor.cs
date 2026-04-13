@@ -14,6 +14,7 @@ namespace Surface_Structures
         private static int _selectedLandmarkIndex = 0;
         private static string _landmarkNames = string.Empty;
         private static LandmarkReference? _selectedLandmark = null;
+        private static Celestial? _selectedLandmarkCelestial = null;
 
         public static void DrawWindow() 
         {
@@ -23,73 +24,121 @@ namespace Surface_Structures
             ImGui.SetNextWindowSize(new float2(400, 500), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("Structure Editor", ref ShowEditorWindow))
             {
-                ImGui.Combo("Structure", ref _selectedStructureIndex, _structureNames, _structureNames.Length);
-                ImGui.Spacing();
-                if (ImGui.Button("Select"))
+                if (ImGui.BeginTabBar("StructureEditorTabs"))
                 {
-                    findStructure();
-                }
-                if (_selectedStructure != null)
-                {
-                    ImGui.Spacing();
-                    ImGui.Separator();
-                    ImGui.Spacing();
-                    ImGui.InputFloat3("Position", ref _selectedStructure.Position);
-                    ImGui.Spacing();
-                    ImGui.InputFloat3("Rotation", ref _selectedStructure.Rotation);
-                    ImGui.Spacing();
-                    ImGui.InputFloat3("Scale", ref _selectedStructure.Scale);
-                    ImGui.Spacing();
-                    ImGui.Checkbox("Visible", ref _selectedStructure.Visible);
-                    ImGui.Spacing();
-                    ImGui.Separator();
-                    ImGui.Spacing();
-                    ImGui.Combo("Landmark", ref _selectedLandmarkIndex, _landmarkNames, _landmarkNames.Length);
-                    ImGui.Spacing();
-                    if(ImGui.Button("Change Landmark"))
+                    if(ImGui.BeginTabItem("Structure Editor"))
                     {
-                        findLandmark();
-                        ChangeStructureLandmark();
+                        DrawStructureEditorTab();
+                        ImGui.EndTabItem();
                     }
-                    ImGui.Spacing();
-                    ImGui.Separator();
-                    ImGui.Spacing();
-                    if (ImGui.CollapsingHeader("Advanced"))
+
+                    if(ImGui.BeginTabItem("Landmark Editor"))
                     {
-                        ImGui.Spacing();
-                        if (ImGui.Button("Reset Position"))
-                        {
-                            _selectedStructure.Position = new float3(0, 0, 0);
-                        }
-                        ImGui.Spacing();
-                        if (ImGui.Button("Reset Rotation"))
-                        {
-                            _selectedStructure.Rotation = new float3(0, 0, 0);
-                        }
-                        ImGui.Spacing();
-                        if (ImGui.Button("Reset Scale"))
-                        {
-                            _selectedStructure.Scale = new float3(1, 1, 1);
-                        }
-                        ImGui.Spacing();
-                        if (ImGui.Button("Reset All"))
-                        {
-                            _selectedStructure.Position = new float3(0, 0, 0);
-                            _selectedStructure.Rotation = new float3(0, 0, 0);
-                            _selectedStructure.Scale = new float3(1, 1, 1);
-                            _selectedStructure.Visible = true;
-                        }
+                        DrawLandmarkEditorTab();
+                        ImGui.EndTabItem();
                     }
-                    ImGui.Spacing();
-                    ImGui.Separator();
-                    ImGui.Spacing();
-                    if (ImGui.Button("Save Changes"))
-                    {
-                        SurfaceStructureParser.SaveStructure(_selectedStructure);
-                    }
+
+                    ImGui.EndTabBar();
                 }
             }
             ImGui.End();
+        }
+
+        private static void DrawStructureEditorTab()
+        {
+            ImGui.TextWrapped("Changes can be saved back to the XML file for persistence.");
+            ImGui.Combo("Structure", ref _selectedStructureIndex, _structureNames, _structureNames.Length);
+            ImGui.Spacing();
+            if (ImGui.Button("Select"))
+            {
+                findStructure();
+            }
+            if (_selectedStructure != null)
+            {
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+                ImGui.Combo("Landmark", ref _selectedLandmarkIndex, _landmarkNames, _landmarkNames.Length);
+                ImGui.Spacing();
+                if (ImGui.Button("Change Landmark"))
+                {
+                    findLandmark();
+                    ChangeStructureLandmark();
+                }
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+                ImGui.InputFloat3("Position", ref _selectedStructure.Position);
+                ImGui.Spacing();
+                ImGui.InputFloat3("Rotation", ref _selectedStructure.Rotation);
+                ImGui.Spacing();
+                ImGui.InputFloat3("Scale", ref _selectedStructure.Scale);
+                ImGui.Spacing();
+                ImGui.Checkbox("Visible", ref _selectedStructure.Visible);
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+                if (ImGui.CollapsingHeader("Advanced"))
+                {
+                    ImGui.Spacing();
+                    if (ImGui.Button("Reset Position"))
+                    {
+                        _selectedStructure.Position = new float3(0, 0, 0);
+                    }
+                    ImGui.Spacing();
+                    if (ImGui.Button("Reset Rotation"))
+                    {
+                        _selectedStructure.Rotation = new float3(0, 0, 0);
+                    }
+                    ImGui.Spacing();
+                    if (ImGui.Button("Reset Scale"))
+                    {
+                        _selectedStructure.Scale = new float3(1, 1, 1);
+                    }
+                    ImGui.Spacing();
+                    if (ImGui.Button("Reset All"))
+                    {
+                        _selectedStructure.Position = new float3(0, 0, 0);
+                        _selectedStructure.Rotation = new float3(0, 0, 0);
+                        _selectedStructure.Scale = new float3(1, 1, 1);
+                        _selectedStructure.Visible = true;
+                    }
+                }
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+                if (ImGui.Button("Save Changes"))
+                {
+                    SurfaceStructureParser.SaveStructure(_selectedStructure);
+                }
+            }
+        }
+
+        private static void DrawLandmarkEditorTab()
+        {
+            ImGui.TextWrapped("Saving changes is not supported yet");
+            ImGui.Combo("Landmark", ref _selectedLandmarkIndex, _landmarkNames, _landmarkNames.Length);
+            ImGui.Spacing();
+            if (ImGui.Button("Select"))
+            {
+                findLandmark();
+            }
+            if (_selectedLandmark != null)
+            {
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+                ImGui.InputDouble("Latitude (Degrees)", ref _selectedLandmark.Latitude.Degrees);
+                ImGui.Spacing();
+                ImGui.InputDouble("Longitude (Degrees)", ref _selectedLandmark.Longitude.Degrees);
+                ImGui.Spacing();
+                if (ImGui.Button("Update Landmark"))
+                {
+                    _selectedLandmark.Latitude = RadianReference.FromDegrees(_selectedLandmark.Latitude.Degrees);
+                    _selectedLandmark.Longitude = RadianReference.FromDegrees(_selectedLandmark.Longitude.Degrees);
+                    _selectedLandmark.OnDataLoad(Mod.Empty);
+                }
+            }
         }
 
         public static void CreateStructureNames()
@@ -149,6 +198,7 @@ namespace Surface_Structures
                     if (index == _selectedLandmarkIndex)
                     {
                         _selectedLandmark = landmark;
+                        _selectedLandmarkCelestial = celestial;
                         return;
                     }
                     index++;
@@ -159,7 +209,7 @@ namespace Surface_Structures
         private static void ChangeStructureLandmark()
         {
             LandmarkMeshRenderer renderer = LandmarkRenderableRegistry.All[_selectedStructure!.RendererIndex];
-            renderer.UpdateLandmark(_selectedLandmark!);
+            renderer.UpdateLandmark(_selectedLandmark!, _selectedLandmarkCelestial!);
             _selectedStructure!.LandmarkName = _selectedLandmark!.Id;
         }
     }

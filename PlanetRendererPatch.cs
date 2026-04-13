@@ -9,12 +9,12 @@ namespace Surface_Structures
     [HarmonyPatch]
     public class PlanetRendererPatch
     {
-        [HarmonyPatch(typeof(PlanetRenderer), "UpdateGroundClutter")]
+        [HarmonyPatch(typeof(PlanetRenderer), "GenerateMeshData")]
         [HarmonyPostfix]
-        public static void DrawLandmarkMeshes(CommandBuffer commandBuffer, Viewport viewport, int frameIndex)
+        public static void DrawLandmarkMeshes(CommandBuffer commandBuffer, Viewport inViewport, int frameIndex)
         {
             foreach (var renderer in LandmarkRenderableRegistry.All)
-                renderer.Draw(viewport);
+                renderer.Draw(inViewport);
         }
     }
 }

@@ -2,7 +2,6 @@
 using Brutal.Numerics;
 using Core;
 using KSA;
-using System.Runtime.InteropServices.Swift;
 
 namespace Surface_Structures
 {
@@ -10,7 +9,7 @@ namespace Surface_Structures
     {
         private StaticMeshRenderable? _mesh;
         private LandmarkReference _landmark;
-        private readonly Celestial _celestial;
+        private Celestial _celestial;
         private LandmarkStructure _landmarkStructure;
         private const float deg2rad = (MathF.PI / 180f);
 
@@ -102,9 +101,10 @@ namespace Surface_Structures
             );
         }
 
-        public void UpdateLandmark(LandmarkReference landmark)
+        public void UpdateLandmark(LandmarkReference landmark, Celestial celestial)
         {
             _landmark = landmark;
+            _celestial = celestial;
         }
 
         public void Dispose() => _mesh?.Dispose();

@@ -29,22 +29,20 @@ To create your own Surface Structure(s), you must create a `Surface Structures.x
 
 ```xml
 <Structures>
-    <SurfaceStructure id="Direction Cube">
-        <Landmark name="CCSFS LC-39A"/>
-        <MeshID id="DirectionCube"/>
-        <Position x="0" y="0" z="0"/>
-        <Rotation x="0" y="0" z="0"/>
-        <Scale x="1" y="1" z="1"/>
-    </SurfaceStructure>
-
-    <SurfaceStructure id="Direction Cube 2">
-        <Landmark name="CCSFS LC-39A"/>
-        <MeshID id="DirectionCube"/>
-        <Position x="0" y="0" z="0"/>
-        <Rotation x="0" y="0" z="0"/>
-        <Scale x="1" y="1" z="1"/>
-        <Visible value="false"/>
-    </SurfaceStructure>
+  <Landmark Name="Example Landmark">
+    <Celestial Id="Earth" />
+    <Longitude Degrees="-80.604" />
+    <Latitude Degrees="28.608" />
+    <Visible Value="true" />
+  </Landmark>
+  <SurfaceStructure Id="Kitten Helmet">
+    <Landmark Name="Example Landmark" />
+    <MeshID Id="KittenHelmetGlb" />
+    <Position X="10" Y="50" Z="100" />
+    <Rotation X="0" Y="0" Z="90" />
+    <Scale X="0.5" Y="0.5" Z="0.5" />
+    <Visible Value="true" />
+  </SurfaceStructure>
 </Structures>
 ```
 

@@ -28,19 +28,20 @@ enabled = true
 To create your own Surface Structure(s), you must create a `Surface Structures.xml` file in your mod. It can be at the top-level folder of your mod or below, this mod will find it. Inside the XML file, you should follow this layout for each Structure you wish to add. 
 
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
 <Structures>
   <Landmark Name="Example Landmark">
     <Celestial Id="Earth" />
-    <Longitude Degrees="-80.604" />
-    <Latitude Degrees="28.608" />
+    <Longitude Degrees="-60.528" />
+    <Latitude Degrees="31.997" />
     <Visible Value="true" />
   </Landmark>
-  <SurfaceStructure Id="Kitten Helmet">
-    <Landmark Name="Example Landmark" />
-    <MeshID Id="KittenHelmetGlb" />
-    <Position X="10" Y="50" Z="100" />
-    <Rotation X="0" Y="0" Z="90" />
-    <Scale X="0.5" Y="0.5" Z="0.5" />
+  <SurfaceStructure Id="VAB">
+    <Landmark Name="CCSFS LC-39A" />
+    <PartId Id="VAB" />
+    <Position X="-700" Y="0" Z="10" />
+    <Rotation X="270" Y="0" Z="0" />
+    <Scale X="3" Y="3" Z="3" />
     <Visible Value="true" />
   </SurfaceStructure>
 </Structures>
@@ -52,22 +53,24 @@ To easily make complicated structures, there is a built-in Structure Editor ONLY
 
 ### What each tag means
 
-The `id` in `<SurfaceStructure id="">` is the name of the structure.
+The `Id` in `<SurfaceStructure Id="">` is the name of the structure.
 
-The `name` in `<Landmark name="CCSFS LC-39A"/>` is the name of the landmark you want to place the mesh at. The landmark must be defined in the planet's or Astronomical's XML definition in `Program Files/Kitten Space Agency/Content/Core`. 
+The `Name` in `<Landmark Name="CCSFS LC-39A"/>` is the name of the landmark you want to place the mesh at. The landmark can be defined by KSA Core or inside the `Surface Structures.xml` file.
 
 For example,
 ```xml
-<Landmark Id="CCSFS LC-39A">
-  <Latitude Degrees="28.60829876577433" />
-  <Longitude Degrees="-80.60412690984597" />
+<Landmark Name="Example Landmark">
+    <Celestial Id="Earth" />
+    <Longitude Degrees="-60.528" />
+    <Latitude Degrees="31.997" />
+    <Visible Value="true" />
 </Landmark>
 ```
 
-The `id` in `<MeshID id="DirectionCube"/>` is the defined `id` in a `<GltfFile id="">` that must be defined in an XML file in `Program Files/Kitten Space Agency/Content/Core`.
+The `Id` in `<PartId Id="DirectionCube"/>` is the defined `Id` in a `<Part Id="">`.
 
 > [!IMPORTANT]
-> `<SurfaceStructure id="">`, `<Landmark name=""/>`, and `<MeshID id=""/>` must all exists and have valid values to register the Mesh to be drawn at the Landmark.
+> `<SurfaceStructure Id="">`, `<Landmark Name=""/>`, and `<PartId Id=""/>` must all exists and have valid values to register the Mesh to be drawn at the Landmark.
 
 The `<Visible>` tag just set the mesh to be visible or not. It is an optional tag as, by default, it is set to `true`.
 

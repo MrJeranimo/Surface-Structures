@@ -27,13 +27,17 @@ namespace Surface_Structures
 
             foreach (string modFolder in modFolders)
             {
-                // Search recursively within each mod folder for the file
-                string[] matches = Directory.EnumerateFiles(modFolder, "Surface Structures.xml", SearchOption.AllDirectories).ToArray();
-
-                if (matches != null)
+                ModEntry? mod = ModLibrary.Manifest.Mods.Find(m => m.Id == Path.GetFileName(modFolder));
+                if (mod != null && mod.Enabled)
                 {
-                    string modName = Path.GetFileName(modFolder);
-                    results[modName] = matches;
+                    // Search recursively within each mod folder for the file
+                    string[] matches = Directory.EnumerateFiles(modFolder, "Surface Structures.xml", SearchOption.AllDirectories).ToArray();
+
+                    if (matches != null)
+                    {
+                        string modName = Path.GetFileName(modFolder);
+                        results[modName] = matches;
+                    }
                 }
             }
 

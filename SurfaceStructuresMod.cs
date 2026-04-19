@@ -21,7 +21,11 @@ namespace Surface_Structures
         public void BeforeSystemSelect()
         {
             MHarmony.PatchAll(typeof(SurfaceStructuresMod).Assembly);
+        }
 
+        [StarMapImmediateLoad]
+        public void ImmediateLoad(Mod mod)
+        {
             XMLStructureFinder.FindModFolder();
             Dictionary<string, string[]> found = XMLStructureFinder.FindSurfaceStructuresFiles();
 
@@ -29,7 +33,7 @@ namespace Surface_Structures
             {
                 foreach (var filePath in filePaths)
                 {
-                    Console.WriteLine($"Surface Structures - Found new XML file in, {modName}: {filePath}");
+                    DefaultCategory.Log.Info($"Surface Structures - Found new XML file in, {modName}: {filePath}");
                     SurfaceStructureParser.ParseFile(filePath);
                 }
             }
@@ -42,7 +46,7 @@ namespace Surface_Structures
             Debug = debug;
 
             if (Debug)
-                Console.WriteLine("Surface Structures - Running in debug mode");
+                DefaultCategory.Log.Info("Surface Structures - Running in debug mode");
         }
 
         [StarMapBeforeGui]
@@ -61,8 +65,8 @@ namespace Surface_Structures
                 {
                     if (celestial.Id == celestialId)
                     {
-                        DefaultCategory.Log.Info($"Surface Structures - New landmark '{landmark.Id}' for celestial '{celestial.Id}'");
                         celestial.BodyTemplate.Locations.Add(landmark);
+                        DefaultCategory.Log.Info($"Surface Structures - Landmarks parsed: {landmark.Id}");
                     }
                 }
 
@@ -72,9 +76,9 @@ namespace Surface_Structures
                     {
                         foreach (var structure in landmarkStructures)
                         {
-                            DefaultCategory.Log.Info($"Surface Structures - Found mesh '{structure.MeshID}' for landmark '{landmark.Id}'");
                             LandmarkRenderableRegistry.Add(new LandmarkMeshRenderer(landmark, celestial, structure));
                             structure.RendererIndex = LandmarkRenderableRegistry.All.Count - 1;
+                            DefaultCategory.Log.Info($"Surface Structures - Structure parsed: {structure.ID}");
                         }
                     }
                 }

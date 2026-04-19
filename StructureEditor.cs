@@ -68,11 +68,11 @@ namespace Surface_Structures
                 ImGui.Spacing();
                 ImGui.Separator();
                 ImGui.Spacing();
-                ImGui.InputFloat3("Position", ref _selectedStructure.Position);
+                ImGui.DragFloat3("Position", ref _selectedStructure.Position);
                 ImGui.Spacing();
-                ImGui.InputFloat3("Rotation", ref _selectedStructure.Rotation);
+                ImGui.DragFloat3("Rotation", ref _selectedStructure.Rotation, vMin: -360f, vMax: 360f);
                 ImGui.Spacing();
-                ImGui.InputFloat3("Scale", ref _selectedStructure.Scale);
+                ImGui.DragFloat3("Scale", ref _selectedStructure.Scale);
                 ImGui.Spacing();
                 ImGui.Checkbox("Visible", ref _selectedStructure.Visible);
                 ImGui.Spacing();
@@ -128,15 +128,14 @@ namespace Surface_Structures
                 ImGui.Spacing();
                 ImGui.Separator();
                 ImGui.Spacing();
-                ImGui.InputDouble("Latitude (Degrees)", ref _selectedLandmark.Latitude.Degrees);
+                ImGui.InputDouble("Latitude (Degrees)", ref _selectedLandmark.Latitude.Degrees, 0.1, 0.5);
                 ImGui.Spacing();
-                ImGui.InputDouble("Longitude (Degrees)", ref _selectedLandmark.Longitude.Degrees);
+                ImGui.InputDouble("Longitude (Degrees)", ref _selectedLandmark.Longitude.Degrees, 0.1, 0.5);
                 ImGui.Spacing();
                 if (ImGui.Button("Update Landmark"))
                 {
                     _selectedLandmark.Latitude = RadianReference.FromDegrees(_selectedLandmark.Latitude.Degrees);
                     _selectedLandmark.Longitude = RadianReference.FromDegrees(_selectedLandmark.Longitude.Degrees);
-                    _selectedLandmark.OnDataLoad(Mod.Empty);
                 }
             }
         }

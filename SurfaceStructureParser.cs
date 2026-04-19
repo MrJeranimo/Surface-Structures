@@ -18,7 +18,6 @@ namespace Surface_Structures
 
             foreach (XElement element in doc.Descendants("Landmark"))
             {
-                Console.WriteLine($"Parsing Landmarks in file: {filePath}");
                 string? name = element.Attribute("Name")?.Value;
                 string? celestial = element.Element("Celestial")?.Attribute("Id")?.Value;
 
@@ -28,8 +27,6 @@ namespace Surface_Structures
                 double longitude = ParseDouble(element.Element("Longitude")?.Attribute("Degrees")?.Value);
                 double latitude = ParseDouble(element.Element("Latitude")?.Attribute("Degrees")?.Value);
                 bool visible = ParseBool(element.Element("Visible")?.Attribute("Value")?.Value);
-
-                Console.WriteLine($"Landmark: {name}, Celestial: {celestial}, Longitude: {longitude}, Latitude: {latitude}, Visible: {visible}");
 
                 LandmarkReference landmark = new LandmarkReference();
                 landmark.Latitude = RadianReference.FromDegrees(latitude);
@@ -44,9 +41,9 @@ namespace Surface_Structures
             {
                 string? id = element.Attribute("Id")?.Value;
                 string? landmarkName = element.Element("Landmark")?.Attribute("Name")?.Value;
-                string? meshID = element.Element("MeshID")?.Attribute("Id")?.Value;
+                string? partID = element.Element("PartId")?.Attribute("Id")?.Value;
 
-                if (string.IsNullOrEmpty(meshID) || string.IsNullOrEmpty(landmarkName) || string.IsNullOrEmpty(id))
+                if (string.IsNullOrEmpty(partID) || string.IsNullOrEmpty(landmarkName) || string.IsNullOrEmpty(id))
                     continue;
 
                 float3 position = ParseFloat3(element.Element("Position"));
@@ -58,7 +55,7 @@ namespace Surface_Structures
 
                 bool visible = ParseBool(element.Element("Visible")?.Attribute("value")?.Value);
 
-                _landmarkStructures.Add(new LandmarkStructure(id, landmarkName, meshID, filePath, position, rotation, scale, visible));
+                _landmarkStructures.Add(new LandmarkStructure(id, landmarkName, partID, filePath, position, rotation, scale, visible));
             }
         }
 

@@ -7,6 +7,125 @@ namespace Surface_Structures
 {
     public class LandmarkMeshRenderer : IDisposable
     {
+        private LandmarkReference _landmark;
+        private Celestial _celestial;
+        private LandmarkStructure _landmarkStructure;
+        private List<PartModel> _partModels = new List<PartModel>();
+        private const float deg2rad = (MathF.PI / 180f);
+
+        public LandmarkMeshRenderer(
+            LandmarkReference landmark,
+            Celestial celestial,
+            LandmarkStructure landmarkStructure)
+        {
+            _landmark = landmark;
+            _landmarkStructure = landmarkStructure;
+            _celestial = celestial;
+
+            try
+            {
+                // Load all subparts from the Part ID
+                PartTemplate partTemplate = ModLibrary.Get<PartTemplate>(landmarkStructure.PartID);
+                foreach (PartInstance subPartInstance in partTemplate.SubPartInstances)
+                {
+                    PartTemplate subPart = subPartInstance.GetTemplate();
+                    PartModelModule.Template? modelTemplate = subPart.Components.OfType<PartModelModule.Template>().FirstOrDefault();
+                    if (modelTemplate != null)
+                        _partModels.Add(PartModel.Get(modelTemplate));
+                }
+                _landmarkStructure.SetLoaded();
+                DefaultCategory.Log.Info($"Surface Structures - Initialized part '{landmarkStructure.PartID}' with {_partModels.Count} subpart(s)");
+            }
+            catch (Exception ex)
+            {
+                DefaultCategory.Log.Error($"Surface Structures - Could not load part: {landmarkStructure.PartID}. Exception\n{ex}");
+            }
+        }
+
+        public void SubmitInstance(Viewport viewport, int frameIndex)
+        {
+            if (_partModels.Count == 0 || !_landmarkStructure.Visible) return;
+
+            var instanceData = new PartModel.PerInstanceData
+            {
+                ModelMatrix = BuildSurfaceTransform(viewport),
+                StateBitFlag = 0
+            };
+
+            foreach (PartModel partModel in _partModels)
+                partModel.AddInstance(instanceData, viewport, frameIndex);
+        }
+
+        private float4x4 BuildSurfaceTransform(Viewport viewport)
+        {
+            double3 forwardCcf = _landmark.ForwardCcf;
+
+            // Build surface basis in CCF - Z axis is north pole in CCF
+            double3 surfaceUpCcf = double3.Normalize(forwardCcf);
+            double3 surfaceEastCcf = double3.Normalize(double3.Cross(new double3(0, 0, 1), surfaceUpCcf));
+            // Pole guard
+            if (surfaceEastCcf.Length() < 0.001)
+                surfaceEastCcf = new double3(1, 0, 0);
+            surfaceEastCcf = double3.Normalize(surfaceEastCcf);
+            double3 surfaceNorthCcf = double3.Normalize(double3.Cross(surfaceEastCcf, surfaceUpCcf));
+
+            // Rotate basis from CCF into CCE (ECL-aligned axes, celestial origin)
+            double4x4 ccf2CceMat = double4x4.CreateFromQuaternion(_celestial.GetCcf2Cce());
+            double3 surfaceUpD = double3.Normalize(double3.TransformNormal(surfaceUpCcf, ccf2CceMat));
+            double3 surfaceEastD = double3.Normalize(double3.TransformNormal(surfaceEastCcf, ccf2CceMat));
+            double3 surfaceNorthD = double3.Normalize(double3.TransformNormal(surfaceNorthCcf, ccf2CceMat));
+
+            // Get surface position in ECL, apply positional offsets along surface basis
+            Camera camera = viewport.GetCamera();
+            double3 surfacePosEcl = _celestial.GetSurfacePositionEclFromCce(forwardCcf.Transform(_celestial.GetCcf2Cce()), false);
+
+            surfacePosEcl += surfaceEastD * _landmarkStructure.Position.X;
+            surfacePosEcl += surfaceNorthD * -_landmarkStructure.Position.Y;
+            surfacePosEcl += surfaceUpD * _landmarkStructure.Position.Z;
+
+            double3 egoPos = camera.EclToEgo(surfacePosEcl);
+            float3 positionEgo = float3.Pack(in egoPos);
+
+            float3 surfaceUp = float3.Pack(surfaceUpD);
+            float3 surfaceEast = float3.Pack(surfaceEastD);
+            float3 surfaceNorth = float3.Pack(surfaceNorthD);
+
+            // Apply landmark rotation around each surface axis
+            floatQuat rotX = floatQuat.CreateFromAxisAngle(surfaceNorth, _landmarkStructure.Rotation.X * deg2rad);
+            floatQuat rotY = floatQuat.CreateFromAxisAngle(-surfaceEast, _landmarkStructure.Rotation.Y * deg2rad);
+            floatQuat rotZ = floatQuat.CreateFromAxisAngle(-surfaceUp, _landmarkStructure.Rotation.Z * deg2rad);
+            floatQuat combined = rotZ * rotY * rotX;
+            float4x4 rotMat = float4x4.CreateFromQuaternion(combined);
+
+            surfaceEast = float3.Normalize(float3.TransformNormal(surfaceEast, rotMat));
+            surfaceNorth = float3.Normalize(float3.TransformNormal(surfaceNorth, rotMat));
+            surfaceUp = float3.Normalize(float3.TransformNormal(surfaceUp, rotMat));
+
+            // Scale basis vectors - no negation
+            float3 col0 = -surfaceNorth * _landmarkStructure.Scale.X;
+            float3 col1 = surfaceUp * _landmarkStructure.Scale.Y;
+            float3 col2 = surfaceEast * _landmarkStructure.Scale.Z;
+
+            return new float4x4(
+                col0.X, col0.Y, col0.Z, 0,
+                col1.X, col1.Y, col1.Z, 0,
+                col2.X, col2.Y, col2.Z, 0,
+                positionEgo.X, positionEgo.Y, positionEgo.Z, 1
+            );
+        }
+
+        public void UpdateLandmark(LandmarkReference landmark, Celestial celestial)
+        {
+            _landmark = landmark;
+            _celestial = celestial;
+        }
+
+        public void Dispose() { } // PartModel lifetime is managed by PartModel.Shared
+    }
+
+    /*
+    public class LandmarkMeshRenderer : IDisposable
+    {
         private StaticMeshRenderable? _mesh;
         private LandmarkReference _landmark;
         private Celestial _celestial;
@@ -109,4 +228,5 @@ namespace Surface_Structures
 
         public void Dispose() => _mesh?.Dispose();
     }
+    */
 }

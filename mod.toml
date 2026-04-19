@@ -2,5 +2,7 @@ name="Surface Structures"
 author="MrJeranimo"
 version="0.3.0"
 
+assets =["SpaceCenter.xml"]
+
 [StarMap]
 EntryAssembly="Surface Structures"

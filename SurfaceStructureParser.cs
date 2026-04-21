@@ -9,6 +9,7 @@ namespace Surface_Structures
     {
         private static List<KeyValuePair<string, LandmarkReference>> _landmarks = new List<KeyValuePair<string, LandmarkReference>>();
         private static List<LandmarkStructure> _landmarkStructures = new List<LandmarkStructure>();
+        public static Dictionary<string, LocationStruct> LocationStructs = new Dictionary<string, LocationStruct>();
 
         public static List<KeyValuePair<string, LandmarkReference>> Landmarks => _landmarks;
 
@@ -35,15 +36,16 @@ namespace Surface_Structures
                 landmark.OnDataLoad(Mod.Empty);
 
                 _landmarks.Add(new KeyValuePair<string, LandmarkReference>(celestial, landmark));
+                LocationStructs.Add(name, new LocationStruct(name, celestial, visible));
             }
 
             foreach (XElement element in doc.Descendants("SurfaceStructure"))
             {
                 string? id = element.Attribute("Id")?.Value;
-                string? landmarkName = element.Element("Landmark")?.Attribute("Name")?.Value;
+                string? locationName = element.Element("Location")?.Attribute("Name")?.Value;
                 string? partID = element.Element("PartId")?.Attribute("Id")?.Value;
 
-                if (string.IsNullOrEmpty(partID) || string.IsNullOrEmpty(landmarkName) || string.IsNullOrEmpty(id))
+                if (string.IsNullOrEmpty(partID) || string.IsNullOrEmpty(locationName) || string.IsNullOrEmpty(id))
                     continue;
 
                 float3 position = ParseFloat3(element.Element("Position"));
@@ -55,7 +57,7 @@ namespace Surface_Structures
 
                 bool visible = ParseBool(element.Element("Visible")?.Attribute("value")?.Value);
 
-                _landmarkStructures.Add(new LandmarkStructure(id, landmarkName, partID, filePath, position, rotation, scale, visible));
+                _landmarkStructures.Add(new LandmarkStructure(id, locationName, partID, filePath, position, rotation, scale, visible));
             }
         }
 
@@ -101,15 +103,15 @@ namespace Surface_Structures
         {
             foreach (var structure in _landmarkStructures)
             {
-                if (!LandmarkRenderableRegistry.MeshMap.ContainsKey(structure.LandmarkName))
+                if (!LandmarkRenderableRegistry.MeshMap.ContainsKey(structure.LocationName))
                 {
-                    LandmarkRenderableRegistry.MeshMap[structure.LandmarkName] = new LandmarkStructure[] { structure };
+                    LandmarkRenderableRegistry.MeshMap[structure.LocationName] = new LandmarkStructure[] { structure };
                 }
                 else
                 {
-                    var existing = LandmarkRenderableRegistry.MeshMap[structure.LandmarkName].ToList();
+                    var existing = LandmarkRenderableRegistry.MeshMap[structure.LocationName].ToList();
                     existing.Add(structure);
-                    LandmarkRenderableRegistry.MeshMap[structure.LandmarkName] = existing.ToArray();
+                    LandmarkRenderableRegistry.MeshMap[structure.LocationName] = existing.ToArray();
                 }
             }
         }
@@ -127,13 +129,13 @@ namespace Surface_Structures
                 if (structure.ID != id)
                     continue;
 
-                XElement? landmark = element.Element("Landmark");
-                string? landmarkName = landmark?.Attribute("Name")?.Value;
-                if(string.IsNullOrEmpty(landmarkName))
+                XElement? location = element.Element("Location");
+                string? locationName = location?.Attribute("Name")?.Value;
+                if(string.IsNullOrEmpty(locationName))
                     continue;
 
-                if(landmark != null)
-                    landmark.SetAttributeValue("Name", structure.LandmarkName);
+                if(location != null)
+                    location.SetAttributeValue("Name", structure.LocationName);
 
                 WriteFloat3(element.Element("Position"), structure.Position);
                 WriteFloat3(element.Element("Rotation"), structure.Rotation);

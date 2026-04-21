@@ -11,10 +11,10 @@ namespace Surface_Structures
         private static LandmarkStructure? _selectedStructure = null;
         private static int _selectedStructureIndex = 0;
         private static string _structureNames = string.Empty;
-        private static int _selectedLandmarkIndex = 0;
-        private static string _landmarkNames = string.Empty;
-        private static LandmarkReference? _selectedLandmark = null;
-        private static Celestial? _selectedLandmarkCelestial = null;
+        private static int _selectedLocationIndex = 0;
+        private static string _locationNames = string.Empty;
+        private static LocationReference? _selectedLocation = null;
+        private static Celestial? _selectedLocationCelestial = null;
 
         public static void DrawWindow() 
         {
@@ -32,9 +32,9 @@ namespace Surface_Structures
                         ImGui.EndTabItem();
                     }
 
-                    if(ImGui.BeginTabItem("Landmark Editor"))
+                    if(ImGui.BeginTabItem("Location Editor"))
                     {
-                        DrawLandmarkEditorTab();
+                        DrawLocationEditorTab();
                         ImGui.EndTabItem();
                     }
 
@@ -58,12 +58,12 @@ namespace Surface_Structures
                 ImGui.Spacing();
                 ImGui.Separator();
                 ImGui.Spacing();
-                ImGui.Combo("Landmark", ref _selectedLandmarkIndex, _landmarkNames, _landmarkNames.Length);
+                ImGui.Combo("Location", ref _selectedLocationIndex, _locationNames, _locationNames.Length);
                 ImGui.Spacing();
-                if (ImGui.Button("Change Landmark"))
+                if (ImGui.Button("Change Location"))
                 {
-                    findLandmark();
-                    ChangeStructureLandmark();
+                    findLocation();
+                    ChangeStructureLocation();
                 }
                 ImGui.Spacing();
                 ImGui.Separator();
@@ -114,28 +114,28 @@ namespace Surface_Structures
             }
         }
 
-        private static void DrawLandmarkEditorTab()
+        private static void DrawLocationEditorTab()
         {
             ImGui.TextWrapped("Saving changes is not supported yet");
-            ImGui.Combo("Landmark", ref _selectedLandmarkIndex, _landmarkNames, _landmarkNames.Length);
+            ImGui.Combo("Location", ref _selectedLocationIndex, _locationNames, _locationNames.Length);
             ImGui.Spacing();
             if (ImGui.Button("Select"))
             {
-                findLandmark();
+                findLocation();
             }
-            if (_selectedLandmark != null)
+            if (_selectedLocation != null)
             {
                 ImGui.Spacing();
                 ImGui.Separator();
                 ImGui.Spacing();
-                ImGui.InputDouble("Latitude (Degrees)", ref _selectedLandmark.Latitude.Degrees, 0.1, 0.5);
+                ImGui.InputDouble("Latitude (Degrees)", ref _selectedLocation.Latitude.Degrees, 0.1, 0.5);
                 ImGui.Spacing();
-                ImGui.InputDouble("Longitude (Degrees)", ref _selectedLandmark.Longitude.Degrees, 0.1, 0.5);
+                ImGui.InputDouble("Longitude (Degrees)", ref _selectedLocation.Longitude.Degrees, 0.1, 0.5);
                 ImGui.Spacing();
-                if (ImGui.Button("Update Landmark"))
+                if (ImGui.Button("Update Location"))
                 {
-                    _selectedLandmark.Latitude = RadianReference.FromDegrees(_selectedLandmark.Latitude.Degrees);
-                    _selectedLandmark.Longitude = RadianReference.FromDegrees(_selectedLandmark.Longitude.Degrees);
+                    _selectedLocation.Latitude = RadianReference.FromDegrees(_selectedLocation.Latitude.Degrees);
+                    _selectedLocation.Longitude = RadianReference.FromDegrees(_selectedLocation.Longitude.Degrees);
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace Surface_Structures
         public static void CreateStructureNames()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var (landmark, structures) in LandmarkRenderableRegistry.MeshMap)
+            foreach (var (location, structures) in LandmarkRenderableRegistry.MeshMap)
             {
                 foreach (var structure in structures)
                 {
@@ -158,7 +158,7 @@ namespace Surface_Structures
         private static void findStructure()
         {
             int index = 0;
-            foreach (var (landmark, structures) in LandmarkRenderableRegistry.MeshMap)
+            foreach (var (location, structures) in LandmarkRenderableRegistry.MeshMap)
             {
                 foreach (var structure in structures)
                 {
@@ -174,30 +174,30 @@ namespace Surface_Structures
             }
         }
 
-        public static void CreateLandmarkNames()
+        public static void CreateLocationNames()
         {
             StringBuilder sb = new StringBuilder();
             foreach (Celestial celestial in Universe.CurrentSystem!.All.OfType<Celestial>())
             {
-                foreach (LandmarkReference landmark in celestial.BodyTemplate.Locations.OfType<LandmarkReference>())
+                foreach (LocationReference location in celestial.BodyTemplate.Locations)
                 {
-                    sb.Append(landmark.Id).Append('\0');
+                    sb.Append(location.Id).Append('\0');
                 }
             }
-            _landmarkNames = sb.ToString();
+            _locationNames = sb.ToString();
         }
 
-        private static void findLandmark()
+        private static void findLocation()
         {
             int index = 0;
             foreach (Celestial celestial in Universe.CurrentSystem!.All.OfType<Celestial>())
             {
-                foreach (LandmarkReference landmark in celestial.BodyTemplate.Locations.OfType<LandmarkReference>())
+                foreach (LocationReference location in celestial.BodyTemplate.Locations)
                 {
-                    if (index == _selectedLandmarkIndex)
+                    if (index == _selectedLocationIndex)
                     {
-                        _selectedLandmark = landmark;
-                        _selectedLandmarkCelestial = celestial;
+                        _selectedLocation = location;
+                        _selectedLocationCelestial = celestial;
                         return;
                     }
                     index++;
@@ -205,11 +205,11 @@ namespace Surface_Structures
             }
         }
 
-        private static void ChangeStructureLandmark()
+        private static void ChangeStructureLocation()
         {
             LandmarkMeshRenderer renderer = LandmarkRenderableRegistry.All[_selectedStructure!.RendererIndex];
-            renderer.UpdateLandmark(_selectedLandmark!, _selectedLandmarkCelestial!);
-            _selectedStructure!.LandmarkName = _selectedLandmark!.Id;
+            renderer.UpdateLandmark(_selectedLocation!, _selectedLocationCelestial!);
+            _selectedStructure!.LocationName = _selectedLocation!.Id;
         }
     }
 }

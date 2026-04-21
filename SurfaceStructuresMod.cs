@@ -72,11 +72,11 @@ namespace Surface_Structures
 
                 foreach (var location in celestial.BodyTemplate.Locations)
                 {
-                    if (location is LandmarkReference landmark && LandmarkRenderableRegistry.MeshMap.TryGetValue(landmark.Id, out var landmarkStructures))
+                    if (LandmarkRenderableRegistry.MeshMap.TryGetValue(location.Id, out var landmarkStructures))
                     {
                         foreach (var structure in landmarkStructures)
                         {
-                            LandmarkRenderableRegistry.Add(new LandmarkMeshRenderer(landmark, celestial, structure));
+                            LandmarkRenderableRegistry.Add(new LandmarkMeshRenderer(location, celestial, structure));
                             structure.RendererIndex = LandmarkRenderableRegistry.All.Count - 1;
                             DefaultCategory.Log.Info($"Surface Structures - Structure parsed: {structure.ID}");
                         }
@@ -87,7 +87,7 @@ namespace Surface_Structures
             if (Debug)
             {
                 StructureEditor.CreateStructureNames();
-                StructureEditor.CreateLandmarkNames();
+                StructureEditor.CreateLocationNames();
             }
         }
 

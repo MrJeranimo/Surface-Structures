@@ -7,18 +7,18 @@ namespace Surface_Structures
 {
     public class LandmarkMeshRenderer : IDisposable
     {
-        private LandmarkReference _landmark;
+        private LocationReference _location;
         private Celestial _celestial;
         private LandmarkStructure _landmarkStructure;
         private List<PartModel> _partModels = new List<PartModel>();
         private const float deg2rad = (MathF.PI / 180f);
 
         public LandmarkMeshRenderer(
-            LandmarkReference landmark,
+            LocationReference landmark,
             Celestial celestial,
             LandmarkStructure landmarkStructure)
         {
-            _landmark = landmark;
+            _location = landmark;
             _landmarkStructure = landmarkStructure;
             _celestial = celestial;
 
@@ -58,7 +58,7 @@ namespace Surface_Structures
 
         private float4x4 BuildSurfaceTransform(Viewport viewport)
         {
-            double3 forwardCcf = _landmark.ForwardCcf;
+            double3 forwardCcf = _location.ForwardCcf;
 
             // Build surface basis in CCF - Z axis is north pole in CCF
             double3 surfaceUpCcf = double3.Normalize(forwardCcf);
@@ -114,9 +114,9 @@ namespace Surface_Structures
             );
         }
 
-        public void UpdateLandmark(LandmarkReference landmark, Celestial celestial)
+        public void UpdateLandmark(LocationReference location, Celestial celestial)
         {
-            _landmark = landmark;
+            _location = location;
             _celestial = celestial;
         }
 

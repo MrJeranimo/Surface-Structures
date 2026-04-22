@@ -16,6 +16,7 @@ namespace Surface_Structures
         public static float3 Position = new float3(0, 0, 0);
         public static bool Debug = false;
         public static bool _showEditorWindow = false;
+        public static bool _isModMenuActive { get; set; } = false;
 
         [StarMapBeforeMain]
         public void BeforeSystemSelect()
@@ -106,7 +107,7 @@ namespace Surface_Structures
             MHarmony.UnpatchAll(nameof(SurfaceStructuresMod));
         }
 
-        [ModMenuEntry("Surface Structures")]
+        [ModMenuEntry("Surface Structures", nameof(_isModMenuActive))]
         public static void ModMenuEntry()
         {
             if (!Debug)

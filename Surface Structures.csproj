@@ -14,7 +14,7 @@
 	
   <ItemGroup>
     <PackageReference Include="Lib.Harmony" Version="2.4.2" />
-    <PackageReference Include="ModMenu.Attributes" Version="1.0.1" />
+    <PackageReference Include="ModMenu.Attributes" Version="1.0.2" />
     <PackageReference Include="StarMap.API" Version="0.3.6" />
   </ItemGroup>
 

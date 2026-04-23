@@ -1,6 +1,10 @@
 # Surface Structures
 
-This is a KSA mod that will place .glb meshes onto the surface of a Celestial at a specified Landmark. The mod will automatically find all Surface Structures defined in other mods in `Documents/My Games/Kitten Space Agency/mods` that have a file named `Surface Structures.xml`.
+This is a KSA mod that will place specified parts onto the surface of a Celestial at a specified Landmark. The mod will automatically find all Surface Structures defined in other mods in `Documents/My Games/Kitten Space Agency/mods` that have a file named `Surface Structures.xml`. You can also define a Mountain, City, or Landmark Reference in the `Surface Structures.xml` file and Surface Structures will create them. 
+
+There is a built in Editor available when `debug = true` which is found in the `config.json` file in the mod files.
+
+This mod contains 1 example Surface Structure and 1 example of each of the Location References.
 
 > [!Important]
 > Requirements:

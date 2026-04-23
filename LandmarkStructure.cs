@@ -4,7 +4,7 @@ namespace Surface_Structures
 {
     public class LandmarkStructure
     {
-        public readonly string ID;
+        public readonly string Id;
         public string LocationName;
         public readonly string PartID;
         public readonly string FilePath;
@@ -17,7 +17,7 @@ namespace Surface_Structures
 
         public LandmarkStructure(string id, string locationName, string partID, string filePath)
         {
-            ID = id;
+            Id = id;
             LocationName = locationName;
             PartID = partID;
             FilePath = filePath;
@@ -25,7 +25,7 @@ namespace Surface_Structures
 
         public LandmarkStructure(string id, string locationName, string partID, string filePath, float3 position)
         {
-            ID = id;
+            Id = id;
             LocationName = locationName;
             PartID = partID;
             FilePath = filePath;
@@ -34,7 +34,7 @@ namespace Surface_Structures
 
         public LandmarkStructure(string id, string locationName, string partID, string filePath, float3 position, float3 rotation, float3 scale, bool visible)
         {
-            ID = id;
+            Id = id;
             LocationName = locationName;
             PartID = partID;
             FilePath = filePath;

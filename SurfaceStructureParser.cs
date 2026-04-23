@@ -1,4 +1,5 @@
-﻿using Brutal.Numerics;
+﻿using Brutal.Logging;
+using Brutal.Numerics;
 using KSA;
 using System.Globalization;
 using System.Xml.Linq;
@@ -7,15 +8,59 @@ namespace Surface_Structures
 {
     public class SurfaceStructureParser
     {
-        private static List<KeyValuePair<string, LandmarkReference>> _landmarks = new List<KeyValuePair<string, LandmarkReference>>();
+        private static List<KeyValuePair<string, LocationReference>> _locations = new List<KeyValuePair<string, LocationReference>>();
         private static List<LandmarkStructure> _landmarkStructures = new List<LandmarkStructure>();
-        public static Dictionary<string, LocationStruct> LocationStructs = new Dictionary<string, LocationStruct>();
+        public static Dictionary<string, LocationData> LocationStructs = new Dictionary<string, LocationData>();
 
-        public static List<KeyValuePair<string, LandmarkReference>> Landmarks => _landmarks;
+        public static List<KeyValuePair<string, LocationReference>> Locations => _locations;
 
         public static void ParseFile(string filePath)
         {
             XDocument doc = XDocument.Load(filePath);
+
+            foreach (XElement element in doc.Descendants("Mountain"))
+            {
+                string? name = element.Attribute("Name")?.Value;
+                string? celestial = element.Element("Celestial")?.Attribute("Id")?.Value;
+
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(celestial))
+                    continue;
+
+                double latitude = ParseDouble(element.Element("Latitude")?.Attribute("Degrees")?.Value);
+                double longitude = ParseDouble(element.Element("Longitude")?.Attribute("Degrees")?.Value);
+                bool visible = ParseBool(element.Element("Visible")?.Attribute("Value")?.Value);
+
+                MountainReference mountain = new MountainReference();
+                mountain.Latitude = RadianReference.FromDegrees(latitude);
+                mountain.Longitude = RadianReference.FromDegrees(longitude);
+                mountain.Id = name;
+                mountain.OnDataLoad(Mod.Empty);
+
+                _locations.Add(new KeyValuePair<string, LocationReference>(celestial, mountain));
+                LocationStructs.Add(name, new LocationData(name, celestial, visible, filePath, latitude, longitude, mountain));
+            }
+
+            foreach (XElement element in doc.Descendants("City"))
+            {
+                string? name = element.Attribute("Name")?.Value;
+                string? celestial = element.Element("Celestial")?.Attribute("Id")?.Value;
+
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(celestial))
+                    continue;
+
+                double latitude = ParseDouble(element.Element("Latitude")?.Attribute("Degrees")?.Value);
+                double longitude = ParseDouble(element.Element("Longitude")?.Attribute("Degrees")?.Value);
+                bool visible = ParseBool(element.Element("Visible")?.Attribute("Value")?.Value);
+
+                CityReference city = new CityReference();
+                city.Latitude = RadianReference.FromDegrees(latitude);
+                city.Longitude = RadianReference.FromDegrees(longitude);
+                city.Id = name;
+                city.OnDataLoad(Mod.Empty);
+
+                _locations.Add(new KeyValuePair<string, LocationReference>(celestial, city));
+                LocationStructs.Add(name, new LocationData(name, celestial, visible, filePath, latitude, longitude, city));
+            }
 
             foreach (XElement element in doc.Descendants("Landmark"))
             {
@@ -25,8 +70,8 @@ namespace Surface_Structures
                 if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(celestial))
                     continue;
 
-                double longitude = ParseDouble(element.Element("Longitude")?.Attribute("Degrees")?.Value);
                 double latitude = ParseDouble(element.Element("Latitude")?.Attribute("Degrees")?.Value);
+                double longitude = ParseDouble(element.Element("Longitude")?.Attribute("Degrees")?.Value);
                 bool visible = ParseBool(element.Element("Visible")?.Attribute("Value")?.Value);
 
                 LandmarkReference landmark = new LandmarkReference();
@@ -35,8 +80,8 @@ namespace Surface_Structures
                 landmark.Id = name;
                 landmark.OnDataLoad(Mod.Empty);
 
-                _landmarks.Add(new KeyValuePair<string, LandmarkReference>(celestial, landmark));
-                LocationStructs.Add(name, new LocationStruct(name, celestial, visible));
+                _locations.Add(new KeyValuePair<string, LocationReference>(celestial, landmark));
+                LocationStructs.Add(name, new LocationData(name, celestial, visible, filePath, latitude, longitude, landmark));
             }
 
             foreach (XElement element in doc.Descendants("SurfaceStructure"))
@@ -123,17 +168,10 @@ namespace Surface_Structures
             foreach (var element in doc.Descendants("SurfaceStructure"))
             {
                 string? id = element.Attribute("Id")?.Value;
-                if (string.IsNullOrEmpty(id))
-                    continue;
-
-                if (structure.ID != id)
+                if (string.IsNullOrEmpty(id) || structure.Id != id)
                     continue;
 
                 XElement? location = element.Element("Location");
-                string? locationName = location?.Attribute("Name")?.Value;
-                if(string.IsNullOrEmpty(locationName))
-                    continue;
-
                 if(location != null)
                     location.SetAttributeValue("Name", structure.LocationName);
 
@@ -157,6 +195,42 @@ namespace Surface_Structures
             element.SetAttributeValue("X", value.X.ToString(CultureInfo.InvariantCulture));
             element.SetAttributeValue("Y", value.Y.ToString(CultureInfo.InvariantCulture));
             element.SetAttributeValue("Z", value.Z.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public static void SaveLocation(LocationData location)
+        {
+            XDocument doc = XDocument.Load(location.Filepath);
+
+            var mountains = doc.Descendants("Mountain");
+            var cities = doc.Descendants("City");
+            var landmarks = doc.Descendants("Landmark");
+
+            var locations = mountains.Concat(cities.Concat(landmarks));
+
+            foreach (XElement element in locations)
+            {
+                string? name = element.Attribute("Name")?.Value;
+                if (string.IsNullOrEmpty(name) || name != location.Name)
+                    continue;
+
+                XElement? celestial = element.Element("Celestial");
+                if (celestial != null)
+                    celestial.SetAttributeValue("Id", location.Celestial);
+
+                XElement? latitude = element.Element("Latitude");
+                if (latitude != null)
+                    latitude.SetAttributeValue("Degrees", location.Latitude.ToString());
+
+                XElement? longitude = element.Element("Longitude");
+                if (longitude != null)
+                    longitude.SetAttributeValue("Degrees", location.Longitude.ToString());
+
+                XElement? visibleElement = element.Element("Visible");
+                if (visibleElement != null)
+                    visibleElement.SetAttributeValue("Value", location.Visible.ToString().ToLower());
+            }
+
+            doc.Save(location.Filepath);
         }
     }
 }

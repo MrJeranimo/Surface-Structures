@@ -120,6 +120,15 @@ namespace Surface_Structures
             _celestial = celestial;
         }
 
+        public Celestial GetCelestial() { return _celestial; }
+
+        public void SetCelestial(Celestial celestial)
+        {
+            _celestial = celestial;
+        }
+
+        public LocationReference GetLocation() { return _location; }
+
         public void Dispose() { } // PartModel lifetime is managed by PartModel.Shared
     }
 

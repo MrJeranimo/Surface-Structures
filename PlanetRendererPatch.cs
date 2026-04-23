@@ -21,7 +21,7 @@ namespace Surface_Structures
         [HarmonyPrefix]
         public static bool HideLocationsPatch(Viewport inViewport, Celestial celestial, LocationReference __instance)
         {
-            if(!SurfaceStructureParser.LocationStructs.TryGetValue(__instance.Id, out LocationStruct? location))
+            if(!SurfaceStructureParser.LocationStructs.TryGetValue(__instance.Id, out LocationData? location))
                 return true;  // If there is no specified LocationStruct, DrawUi
 
             if (location.Celestial == celestial.Id && !location.Visible)

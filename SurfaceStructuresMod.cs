@@ -62,12 +62,13 @@ namespace Surface_Structures
 
             foreach (Celestial celestial in Universe.CurrentSystem.All.OfType<Celestial>())
             {
-                foreach (var (celestialId, landmark) in SurfaceStructureParser.Landmarks)
+                foreach (var (celestialId, location) in SurfaceStructureParser.Locations)
                 {
                     if (celestial.Id == celestialId)
                     {
-                        celestial.BodyTemplate.Locations.Add(landmark);
-                        DefaultCategory.Log.Info($"Surface Structures - Landmarks parsed: {landmark.Id}");
+                        celestial.BodyTemplate.Locations.Add(location);
+                        if (Debug)
+                            DefaultCategory.Log.Info($"Surface Structures - Location parsed: {location.Id}");
                     }
                 }
 
@@ -79,7 +80,8 @@ namespace Surface_Structures
                         {
                             LandmarkRenderableRegistry.Add(new LandmarkMeshRenderer(location, celestial, structure));
                             structure.RendererIndex = LandmarkRenderableRegistry.All.Count - 1;
-                            DefaultCategory.Log.Info($"Surface Structures - Structure parsed: {structure.ID}");
+                            if (Debug)
+                                DefaultCategory.Log.Info($"Surface Structures - Structure parsed: {structure.Id}");
                         }
                     }
                 }
@@ -88,7 +90,9 @@ namespace Surface_Structures
             if (Debug)
             {
                 StructureEditor.CreateStructureNames();
+                StructureEditor.CreateStructureLocationNames();
                 StructureEditor.CreateLocationNames();
+                StructureEditor.CreateCelestialNames();
             }
         }
 

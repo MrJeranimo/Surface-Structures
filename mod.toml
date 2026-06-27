@@ -1,8 +1,9 @@
 name="Surface Structures"
 author="MrJeranimo"
-version="0.3.2"
+version="0.3.3"
+description="This is a mod that allows other mods to place Meshes as parts onto the surface of Celestials using LocationReferences."
 
-assets =["SpaceCenter.xml"]
+assets=["SpaceCenter.xml"]
 
 [StarMap]
 EntryAssembly="Surface Structures"

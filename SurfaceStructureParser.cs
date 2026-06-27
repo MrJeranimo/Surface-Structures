@@ -1,5 +1,4 @@
-﻿using Brutal.Logging;
-using Brutal.Numerics;
+﻿using Brutal.Numerics;
 using KSA;
 using System.Globalization;
 using System.Xml.Linq;

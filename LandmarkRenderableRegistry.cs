@@ -1,6 +1,4 @@
-﻿using Brutal.Numerics;
-
-namespace Surface_Structures {
+﻿namespace Surface_Structures {
     public static class LandmarkRenderableRegistry
     {
         private static readonly List<LandmarkMeshRenderer> _renderers = new();
